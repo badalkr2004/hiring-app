@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  avatar    String?
+  phone     String?
+  location  String?
+  skills    String[]
+  experience String?
+  resume    String?
+  isActive  Boolean  @default(true)
+  isVerified Boolean @default(false)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  applications Application[]
+  company      Company?
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Company {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  website     String?
+  logo        String?
+  size        String?
+  industry    String?
+  location    String?
+  foundedYear Int?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId String @unique @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs   Job[]
+
+  @@map("companies")
+}
+
+model Job {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  requirements String[]
+  benefits    String[]
+  location    String
+  type        JobType
+  category    String
+  salary      String
+  status      JobStatus @default(ACTIVE)
+  featured    Boolean   @default(false)
+  views       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  expiresAt   DateTime?
+
+  // Relations
+  companyId String @db.ObjectId
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications Application[]
+
+  @@map("jobs")
+}
+
+model Application {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  status      ApplicationStatus @default(PENDING)
+  coverLetter String?
+  resume      String?
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Relations
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId  String @db.ObjectId
+  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@map("applications")
+}
+
+model RefreshToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+enum UserRole {
+  USER
+  COMPANY
+  ADMIN
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  REMOTE
+  INTERNSHIP
+}
+
+enum JobStatus {
+  ACTIVE
+  CLOSED
+  DRAFT
+  EXPIRED
+}
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWED
+  SHORTLISTED
+  REJECTED
+  HIRED
+}

@@ -1,0 +1,72 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import Header from "./components/Header";
+import ProtectedRoute from "./components/ProtectedRoute";
+import HomePage from "./pages/HomePage";
+import JobDetailPage from "./pages/JobDetailPage";
+import PostJobPage from "./pages/PostJobPage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import DashboardPage from "./pages/DashboardPage";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <Header />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/jobs/:id" element={<JobDetailPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/post-job"
+                element={
+                  <ProtectedRoute allowedRoles={["company", "admin"]}>
+                    <PostJobPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Redirect unknown routes */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </Router>
+      </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+}
+
+export default App;
