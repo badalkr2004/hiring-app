@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { PrismaClientValidationError, PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AppError } from '@/utils/AppError';
 import logger from '@/utils/logger';
@@ -7,7 +7,6 @@ export const errorHandler = (
   error: Error,
   req: Request,
   res: Response,
-  next: NextFunction
 ) => {
   let statusCode = 500;
   let message = 'Internal server error';
