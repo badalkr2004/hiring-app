@@ -35,7 +35,9 @@ const JobCard = ({ job }) => {
             </div>
             <div>
               <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
-                {job.title}
+                {job.title.length > 20
+                  ? job.title.slice(0, 20) + "..."
+                  : job.title}
               </h3>
               <p className="text-gray-600">{job.company}</p>
             </div>
@@ -51,7 +53,10 @@ const JobCard = ({ job }) => {
         <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
           <div className="flex items-center space-x-1">
             <MapPin className="h-4 w-4" />
-            <span>{job.location}</span>
+            <span>{job.location.length > 10
+                  ? job.location.slice(0, 10) + "..."
+                  : job.location}
+            </span>
           </div>
           <div className="flex items-center space-x-1">
             <Clock className="h-4 w-4" />
@@ -63,7 +68,11 @@ const JobCard = ({ job }) => {
           </div>
         </div>
 
-        <p className="text-gray-700 mb-4 line-clamp-2">{job.description}</p>
+        <p className="text-gray-700 mb-4 line-clamp-3">
+          {job.description.length > 125
+            ? job.description.slice(0, 125) + "..."
+            : job.description}
+        </p>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">

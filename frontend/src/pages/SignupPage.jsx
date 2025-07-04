@@ -85,277 +85,263 @@ const SignupPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
-        <div className="text-center">
-          <Link to="/" className="inline-flex items-center space-x-2 group">
-            <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl group-hover:from-blue-700 group-hover:to-indigo-700 transition-all duration-200">
-              <Briefcase className="h-8 w-8 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              JobFlow
-            </span>
-          </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
-            >
-              Sign in here
-            </Link>
-          </p>
+    <div className="min-h-screen flex flex-col md:flex-row  bg-blue-100">
+      {/* Left Side: Branding & Features */}
+      <div className="flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-16 py-12">
+        <div className="flex items-center mb-8">
+          <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center shadow-md mr-4">
+            <Briefcase className="h-8 w-8 text-white" />
+          </div>
+          <span className="text-3xl font-bold text-gray-900">JobFlow</span>
         </div>
-
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+          Hire Top Talent <br /> with <span className="text-blue-600">JobFlow</span>
+        </h1>
+        <p className="text-lg text-gray-600 mb-8 max-w-xl">
+          Post jobs, manage applicants, and grow your team with ease. Connect with thousands of candidates and top companies on JobFlow.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-6 w-full max-w-xl">
+          <div className="flex-1 bg-white rounded-2xl shadow p-6 flex items-center space-x-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Briefcase className="h-6 w-6 text-blue-600" />
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                I am signing up as:
-              </label>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("role", "user")}
-                  className={`p-4 border-2 rounded-lg transition-all duration-200 ${
-                    formData.role === "user"
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <User className="h-6 w-6 mx-auto mb-2" />
-                  <div className="font-medium">Job Seeker</div>
-                  <div className="text-sm text-gray-600">
-                    Looking for opportunities
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("role", "company")}
-                  className={`p-4 border-2 rounded-lg transition-all duration-200 ${
-                    formData.role === "company"
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <Building className="h-6 w-6 mx-auto mb-2" />
-                  <div className="font-medium">Employer</div>
-                  <div className="text-sm text-gray-600">Hiring talent</div>
-                </button>
-              </div>
+              <div className="font-bold text-lg text-gray-900">10,000+ Candidates</div>
+              <div className="text-gray-500 text-sm">Active job seekers</div>
             </div>
-
-            {/* Personal Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    handleInputChange("firstName", e.target.value)
-                  }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your first name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    handleInputChange("lastName", e.target.value)
-                  }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your last name"
-                />
-              </div>
+          </div>
+          <div className="flex-1 bg-white rounded-2xl shadow p-6 flex items-center space-x-4">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <Building className="h-6 w-6 text-green-600" />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
-                />
-              </div>
+              <div className="font-bold text-lg text-gray-900">500+ Companies</div>
+              <div className="text-gray-500 text-sm">Top employers</div>
             </div>
-
-            {/* Company Information (if role is company) */}
-            {formData.role === "company" && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.companyName}
-                    onChange={(e) =>
-                      handleInputChange("companyName", e.target.value)
-                    }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your company name"
-                  />
+          </div>
+        </div>
+      </div>
+      {/* Right Side: Signup Form */}
+      <div className="flex flex-1 items-center justify-center py-12 px-4 sm:px-8 bg-transparent">
+        <div className="w-full max-w-lg">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Create Your Account</h2>
+            <p className="mb-6 text-sm text-gray-600 text-center">
+              Sign up to start hiring or finding jobs
+            </p>
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Role Selection */}
+              <div>
+                <div className="mb-2 text-sm font-semibold text-gray-700">Sign up as</div>
+                <div className="flex space-x-4 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange("role", "user")}
+                    className={`flex flex-col items-center px-6 py-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                      formData.role === "user"
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <User className="h-6 w-6 mb-1" />
+                    <span className="font-medium">Job Seeker</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange("role", "company")}
+                    className={`flex flex-col items-center px-6 py-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                      formData.role === "company"
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <Building className="h-6 w-6 mb-1" />
+                    <span className="font-medium">Employer</span>
+                  </button>
                 </div>
+              </div>
+              {/* Personal Info */}
+              <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Company Size
-                    </label>
-                    <select
-                      value={formData.companySize}
-                      onChange={(e) =>
-                        handleInputChange("companySize", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    >
-                      <option value="">Select company size</option>
-                      {companySizes.map((size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">First Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                      placeholder="Enter your first name"
+                    />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Industry
-                    </label>
-                    <select
-                      value={formData.industry}
-                      onChange={(e) =>
-                        handleInputChange("industry", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    >
-                      <option value="">Select industry</option>
-                      {industries.map((industry) => (
-                        <option key={industry} value={industry}>
-                          {industry}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Last Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                      placeholder="Enter your last name"
+                    />
                   </div>
                 </div>
-              </>
-            )}
-
-            {/* Password Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={(e) =>
-                      handleInputChange("password", e.target.value)
-                    }
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Create password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
-                </label>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Email Address</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
-                    type={showConfirmPassword ? "text" : "password"}
+                    type="email"
                     required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Confirm password"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                    placeholder="Enter your email"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
                 </div>
               </div>
+              {/* Company Info */}
+              {formData.role === "company" && (
+                <div>
+                  <div className="mb-2 text-sm font-semibold text-gray-700">Company Information</div>
+                  <div className="mb-4">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Company Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.companyName}
+                      onChange={(e) => handleInputChange("companyName", e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                      placeholder="Enter your company name"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Company Size</label>
+                      <select
+                        value={formData.companySize}
+                        onChange={(e) => handleInputChange("companySize", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                      >
+                        <option value="">Select company size</option>
+                        {companySizes.map((size) => (
+                          <option key={size} value={size}>
+                            {size}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Industry</label>
+                      <select
+                        value={formData.industry}
+                        onChange={(e) => handleInputChange("industry", e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                      >
+                        <option value="">Select industry</option>
+                        {industries.map((industry) => (
+                          <option key={industry} value={industry}>
+                            {industry}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* Security */}
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        value={formData.password}
+                        onChange={(e) => handleInputChange("password", e.target.value)}
+                        className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                        placeholder="Create password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                        placeholder="Confirm password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  required
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-600">
+                  I agree to the{' '}
+                  <Link to="/terms" className="text-blue-600 hover:text-blue-500">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
+                    Privacy Policy
+                  </Link>
+                </span>
+              </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-md"
+              >
+                {isLoading ? "Creating account..." : "Create Account"}
+              </button>
+            </form>
+            <div className="mt-6 text-center text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
+                Sign in here
+              </Link>
             </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                required
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-sm text-gray-600">
-                I agree to the{" "}
-                <Link to="/terms" className="text-blue-600 hover:text-blue-500">
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link
-                  to="/privacy"
-                  className="text-blue-600 hover:text-blue-500"
-                >
-                  Privacy Policy
-                </Link>
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Creating account..." : "Create Account"}
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     </div>

@@ -52,16 +52,41 @@ const JobList = ({ jobs, isLoading }) => {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2">
-          <Briefcase className="h-5 w-5 text-gray-600" />
-          <span className="text-gray-600">
-            {jobs.length} job{jobs.length !== 1 ? "s" : ""} found
-          </span>
+    <div className="space-y-4 mt-4">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg">
+              <Briefcase className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {jobs.length} job{jobs.length !== 1 ? "s" : ""} found
+              </h2>
+              <p className="text-gray-600 text-sm">
+                Discover your next career opportunity
+              </p>
+            </div>
+          </div>
+          
+          {/* Quick Stats */}
+          <div className="hidden lg:flex items-center space-x-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{jobs.length}</div>
+              <div className="text-xs text-gray-500">Total Jobs</div>
+            </div>
+            <div className="w-px h-12 bg-gray-200"></div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {jobs.filter(job => job.featured).length}
+              </div>
+              <div className="text-xs text-gray-500">Featured</div>
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Jobs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {jobs.map((job) => (
           <JobCard key={job.id} job={job} />
