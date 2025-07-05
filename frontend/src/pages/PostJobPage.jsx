@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import {
   Building,
   MapPin,
@@ -9,7 +8,7 @@ import {
   FileText,
   CheckCircle,
 } from "lucide-react";
-import { jobService } from "../services/jobService";
+import { api } from "../libs/apis";
 
 const PostJobPage = () => {
   const [formData, setFormData] = useState({
@@ -24,29 +23,8 @@ const PostJobPage = () => {
     benefits: [""],
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const createJobMutation = useMutation({
-    mutationFn: (jobData) => jobService.createJob(jobData),
-    onSuccess: () => {
-      setIsSuccess(true);
-      setTimeout(() => {
-        setIsSuccess(false);
-        // Reset form
-        setFormData({
-          title: "",
-          company: "",
-          location: "",
-          type: "full-time",
-          category: "",
-          salary: "",
-          description: "",
-          requirements: [""],
-          benefits: [""],
-        });
-      }, 3000);
-    },
-  });
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -73,17 +51,33 @@ const PostJobPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const jobData = {
-      ...formData,
-      requirements: formData.requirements.filter((req) => req.trim() !== ""),
-      benefits: formData.benefits.filter((benefit) => benefit.trim() !== ""),
-      featured: false,
-    };
-
-    createJobMutation.mutate(jobData);
+    try {
+      setLoading(true);
+      const response = await api.post("/jobs", formData);
+      if (response.success) {
+        setIsSuccess(true);
+        setFormData({
+          title: "",
+          company: "",
+          location: "",
+          type: "full-time",
+          category: "",
+          salary: "",
+          description: "",
+          requirements: [""],
+          benefits: [""],
+        });
+      } else {
+        throw new Error(response.message || "Failed to post job");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isSuccess) {
@@ -181,10 +175,11 @@ const PostJobPage = () => {
                   onChange={(e) => handleInputChange("type", e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
-                  <option value="full-time">Full Time</option>
-                  <option value="part-time">Part Time</option>
-                  <option value="contract">Contract</option>
-                  <option value="remote">Remote</option>
+                  <option value="FULL_TIME">Full Time</option>
+                  <option value="PART_TIME">Part Time</option>
+                  <option value="CONTRACT">Contract</option>
+                  <option value="REMOTE">Remote</option>
+                  <option value="INTERNSHIP">Internship</option>
                 </select>
               </div>
 
@@ -326,10 +321,10 @@ const PostJobPage = () => {
               </button>
               <button
                 type="submit"
-                disabled={createJobMutation.isPending}
+                disabled={isLoading}
                 className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium disabled:opacity-50"
               >
-                {createJobMutation.isPending ? "Posting..." : "Post Job"}
+                {isLoading ? "Posting..." : "Post Job"}
               </button>
             </div>
           </form>
