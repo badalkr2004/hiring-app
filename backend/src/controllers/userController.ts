@@ -1,7 +1,7 @@
-import { Response } from 'express';
-import prisma from '@/config/database';
-import { ApiError } from '@/utils/ApiError';
-import { AuthRequest } from '@/middleware/auth';
+import { Response } from "express";
+import prisma from "@/config/database";
+import { ApiError } from "@/utils/ApiError";
+import { AuthRequest } from "@/middleware/auth";
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   const { firstName, lastName, phone, location, skills, experience } = req.body;
@@ -14,7 +14,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       phone,
       location,
       skills,
-      experience
+      experience,
     },
     select: {
       id: true,
@@ -30,21 +30,30 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       isActive: true,
       isVerified: true,
       createdAt: true,
-      company: true
-    }
+      company: true,
+    },
   });
 
   res.json({
     success: true,
-    data: { user }
+    data: { user },
   });
 };
 
 export const uploadAvatar = async (req: AuthRequest, res: Response) => {
-  // This would typically handle file upload to cloud storage
-  // For now, we'll just return a placeholder
+  if (!req.file) {
+    throw new ApiError("No file uploaded", 400);
+  }
+  console.log(req.user?.id, req.file.path);
+  // Update the user's avatar URL in the database
+  await prisma.user.update({
+    where: { id: req.user!.id },
+    data: { avatar: req.file.path },
+  });
+
   res.json({
     success: true,
-    message: 'Avatar upload endpoint - implement with multer and cloudinary'
+    message: "Avatar uploaded successfully",
+    data: { avatarUrl: req.file.path },
   });
 };
