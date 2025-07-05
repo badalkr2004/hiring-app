@@ -29,12 +29,12 @@ const Header = () => {
 
   const navItems = [
     { path: "/", label: "Jobs", icon: Search },
-    { path: "/post-job", label: "Post Job", icon: Plus, requiresAuth: true, requiresRole: "EMPLOYER" },
+    { path: "/post-job", label: "Post Job", icon: Plus, requiresAuth: true, requiresRole: "COMPANY" },
     { path: "/companies", label: "Companies", icon: Users },
   ];
 
   const filteredNavItems = navItems.filter(
-    (item) => !item.requiresAuth || (item.requiresAuth && userData && (userData.role === item.requiresRole || userData.role === "ADMIN"))
+    (item) => !item.requiresAuth || (item.requiresAuth && userData && (userData?.role === item.requiresRole || userData?.role === "ADMIN"))
   );
 
   return (

@@ -17,7 +17,7 @@ const SearchBar = ({ filters, onFiltersChange }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-6 mb-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />

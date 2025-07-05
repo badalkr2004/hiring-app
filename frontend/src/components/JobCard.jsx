@@ -18,6 +18,7 @@ const JobCard = ({ job }) => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -61,11 +62,11 @@ const JobCard = ({ job }) => {
           </div>
           <div className="flex items-center space-x-1">
             <Clock className="h-4 w-4" />
-            <span>{formatDate(job.postedDate)}</span>
+            <span>{formatDate(job.createdAt)}</span>
           </div>
           <div className="flex items-center space-x-1">
             <DollarSign className="h-4 w-4" />
-            <span>{job.salary}</span>
+            <span>{job.salary.length > 16 ? job.salary.slice(0, 16) + "..." : job.salary}</span>
           </div>
         </div>
 
@@ -82,7 +83,7 @@ const JobCard = ({ job }) => {
                 job.type
               )}`}
             >
-              {job.type.replace("-", " ").toUpperCase()}
+              {job.type.replace("_", " ").toUpperCase()}
             </span>
             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
               {job.category}

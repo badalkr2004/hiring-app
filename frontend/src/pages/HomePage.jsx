@@ -91,7 +91,7 @@ const HomePage = () => {
           <SearchBar filters={filters} onFiltersChange={setFilters} />
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-4">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
