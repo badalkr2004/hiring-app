@@ -14,16 +14,18 @@ const CompanySettings = () => {
   const { userData, isLoading } = useAuth(); // isLoading is used to show a loading spinner when the user details are being fetched
 
   // update company details is in userDetails.company
-  const [companyDetails, setCompanyDetails] = useState(userData.company ?? {
-    name: "",
-    website: "",
-    industry: "",
-    size: "",
-    location: "",
-    description: "",
-    logo: "",
-    foundedYear: "",
-  });
+  const [companyDetails, setCompanyDetails] = useState(
+    userData.company ?? {
+      name: "",
+      website: "",
+      industry: "",
+      size: "",
+      location: "",
+      description: "",
+      logo: "",
+      foundedYear: "",
+    }
+  );
 
   const [securityForm, setSecurityForm] = useState({
     currentPassword: "",
@@ -68,7 +70,6 @@ const CompanySettings = () => {
     setMessage({ type: "", text: "" });
 
     try {
-
       let logo = companyDetails.logo;
 
       if (logoFile) {
@@ -131,14 +132,22 @@ const CompanySettings = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      setMessage({ type: "success", text: "Password changed successfully!" });
-      setSecurityForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-        twoFactorAuth: securityForm.twoFactorAuth,
+      const response = await api.post("/auth/change-password", {
+        currentPassword: securityForm.currentPassword,
+        newPassword: securityForm.newPassword,
       });
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+
+      if (response?.success) {
+        setMessage({ type: "success", text: "Password changed successfully!" });
+        setSecurityForm({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        setMessage({ type: "error", text: response.message });
+      }
+
     } catch (error) {
       setMessage({
         type: "error",
@@ -335,7 +344,9 @@ const CompanySettings = () => {
                       <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden shadow-lg border-4 border-white">
                         {companyDetails.logo || logoPreview ? (
                           <img
-                            src={logoPreview ? logoPreview : companyDetails.logo}
+                            src={
+                              logoPreview ? logoPreview : companyDetails.logo
+                            }
                             alt="Logo preview"
                             className="w-full h-full object-cover"
                           />

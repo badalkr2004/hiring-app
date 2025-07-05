@@ -165,8 +165,8 @@ const UserSettings = () => {
             formData.append('file', avatarFile);
             formData.append('upload_preset', 'c7rtf3gv');
             const response = await handleUpload(formData);
-            setAvatarUrl(response.url);
-            setUserData({ ...userData, avatar: response.url });
+            setAvatarUrl(response.secure_url);
+            setUserData({ ...userData, avatar: response.secure_url });
             setMessage({ type: 'success', text: 'Avatar uploaded successfully!' });
             setAvatarFile(null);
         } catch (error) {
