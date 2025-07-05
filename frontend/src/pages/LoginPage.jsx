@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, Briefcase } from "lucide-react";
 import { useApiMutation } from "../libs/useApi";
 import { useAuth } from "../contexts/AuthContext";
@@ -11,16 +11,22 @@ const LoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);  
   const [error, setError] = useState("");
-  const { setUserData } = useAuth();
+  const { setUserData, setTokens } = useAuth();
+  const navigate = useNavigate();
   const { mutate, isPending } = useApiMutation('post', '/auth/login');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     mutate(formData, {
       onSuccess: (data) => {
-        setUserData(data);
+        if(data.success){
+          setUserData(data.data.user);
+          setTokens(data.data.accessToken);
+          navigate("/");
+        }
       },
       onError: (error) => {
+        console.log(error);
         setError(error.message);
       },
     });
