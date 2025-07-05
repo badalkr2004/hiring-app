@@ -6,7 +6,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
@@ -16,6 +15,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import DashboardPage from "./pages/DashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {

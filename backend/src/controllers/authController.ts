@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { UserRole } from "@prisma/client";
 import prisma from "@/config/database";
-import { AppError } from "@/utils/AppError";
 import { hashPassword, comparePassword } from "@/utils/password";
 import {
   generateAccessToken,
@@ -9,6 +8,7 @@ import {
   verifyRefreshToken,
 } from "@/utils/jwt";
 import { AuthRequest } from "@/middleware/auth";
+import { ApiError } from "@/utils/ApiError";
 
 export const register = async (req: Request, res: Response) => {
   const {
@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response) => {
   });
 
   if (existingUser) {
-    throw new AppError("User already exists with this email", 409);
+    throw new ApiError("User already exists with this email", 409);
   }
 
   // Hash password
@@ -102,18 +102,18 @@ export const login = async (req: Request, res: Response) => {
   });
 
   if (!user) {
-    throw new AppError("Invalid credentials", 401);
+    throw new ApiError("Invalid credentials", 401);
   }
 
   // Check if user is active
   if (!user.isActive) {
-    throw new AppError("Account is deactivated", 401);
+    throw new ApiError("Account is deactivated", 401);
   }
 
   // Verify password
   const isPasswordValid = await comparePassword(password, user.password);
   if (!isPasswordValid) {
-    throw new AppError("Invalid credentials", 401);
+    throw new ApiError("Invalid credentials", 401);
   }
 
   // Update last login
@@ -158,7 +158,7 @@ export const refreshToken = async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    throw new AppError("Refresh token required", 400);
+    throw new ApiError("Refresh token required", 400);
   }
 
   // Verify refresh token
@@ -171,7 +171,7 @@ export const refreshToken = async (req: Request, res: Response) => {
   });
 
   if (!storedToken || storedToken.expiresAt < new Date()) {
-    throw new AppError("Invalid or expired refresh token", 401);
+    throw new ApiError("Invalid or expired refresh token", 401);
   }
 
   // Generate new access token
@@ -219,7 +219,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
   });
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new ApiError("User not found", 404);
   }
 
   res.json({

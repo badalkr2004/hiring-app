@@ -1,63 +1,95 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { API_BASE_URL } from "../config/api";
 
-import { authService } from "../services/authService";
+const AuthContext = createContext(null);
 
-const AuthContext = createContext();
+export const AuthProvider = ({ children }) => {
+  const [accessToken, setAccessToken] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  
+  const setTokens = useCallback((access) => {
+    setAccessToken(access);
+    setIsLoggedIn(true);
+    localStorage.setItem("accessToken", access);
+  }, []);
+
+  const clearTokens = useCallback(() => {
+    setIsLoggedIn(false);
+    setUserData(null);
+    localStorage.removeItem("accessToken");
+  }, []);
+
+  const validateToken = useCallback(async () => {
+    if (!accessToken) {
+      clearTokens();
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Token validation failed");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setUserData(data.data);
+      }else {
+        clearTokens();
+      }
+    } catch (error) {
+      console.error("Token validation error:", error);
+      clearTokens();
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accessToken, clearTokens]);
+
+  useEffect(() => {
+    const storedAccess = localStorage.getItem("accessToken");
+    if (storedAccess) {
+      setAccessToken(storedAccess);
+      validateToken();
+    }else {
+      setIsLoggedIn(false);
+      setUserData(null);
+    }
+  }, [validateToken]);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        isLoggedIn,
+        setTokens,
+        clearTokens,
+        isLoading,
+        userData,
+        setUserData,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
-};
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const userData = await authService.getCurrentUser();
-          setUser(userData);
-        }
-      } catch (error) {
-        localStorage.removeItem("token");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initAuth();
-  }, []);
-
-  const login = async (email, password) => {
-    const { user: userData, token } = await authService.login(email, password);
-    localStorage.setItem("token", token);
-    setUser(userData);
-  };
-
-  const signup = async (userData) => {
-    const { user: newUser, token } = await authService.signup(userData);
-    localStorage.setItem("token", token);
-    setUser(newUser);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-  };
-
-  const value = {
-    user,
-    login,
-    signup,
-    logout,
-    isLoading,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

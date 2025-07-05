@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import prisma from '@/config/database';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 import { AuthRequest } from '@/middleware/auth';
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, Briefcase } from "lucide-react";
+import { useApiMutation } from "../libs/useApi";
 import { useAuth } from "../contexts/AuthContext";
 
 const LoginPage = () => {
@@ -8,45 +9,26 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);  
   const [error, setError] = useState("");
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const from = location.state?.from?.pathname || "/dashboard";
+  const { setUserData } = useAuth();
+  const { mutate, isPending } = useApiMutation('post', '/auth/login');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await login(formData.email, formData.password);
-      navigate(from, { replace: true });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
-    } finally {
-      setIsLoading(false);
-    }
+    mutate(formData, {
+      onSuccess: (data) => {
+        setUserData(data);
+      },
+      onError: (error) => {
+        setError(error.message);
+      },
+    });
   };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
-  };
-
-  // Demo credentials
-  const demoCredentials = [
-    { role: "Super Admin", email: "admin@jobflow.com", password: "admin123" },
-    { role: "Company", email: "company@techflow.com", password: "company123" },
-    { role: "User", email: "john@example.com", password: "user123" },
-  ];
-
-  const fillDemoCredentials = (email, password) => {
-    setFormData({ email, password });
   };
 
   return (
@@ -120,7 +102,7 @@ const LoginPage = () => {
                   Email Address
                 </label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-blue-500 transition-colors duration-200" />
+                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 duration-200 text-black" />
                   <input
                     type="email"
                     required
@@ -137,7 +119,7 @@ const LoginPage = () => {
                   Password
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-blue-500 transition-colors duration-200" />
+                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 duration-200 text-black" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
@@ -149,7 +131,7 @@ const LoginPage = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:text-gray-600 transition-colors duration-200"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -178,30 +160,12 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isPending}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isPending ? "Signing in..." : "Sign In"}
               </button>
             </form>
-
-            {/* <div className="mt-8 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-600 mb-4 text-center font-medium">
-                Try Demo Credentials
-              </p>
-              <div className="space-y-3">
-                {demoCredentials.map((cred, index) => (
-                  <button
-                    key={index}
-                    onClick={() => fillDemoCredentials(cred.email, cred.password)}
-                    className="w-full text-left p-4 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 rounded-xl transition-all duration-200 text-sm border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md"
-                  >
-                    <div className="font-semibold text-gray-900">{cred.role}</div>
-                    <div className="text-gray-600">{cred.email}</div>
-                  </button>
-                ))}
-              </div>
-            </div> */}
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">

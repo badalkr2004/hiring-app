@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { JobType, JobStatus } from '@prisma/client';
 import prisma from '@/config/database';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 import { AuthRequest } from '@/middleware/auth';
 
 export const getJobs = async (req: Request, res: Response) => {
@@ -115,7 +115,7 @@ export const getJobById = async (req: Request, res: Response) => {
   });
 
   if (!job) {
-    throw new AppError('Job not found', 404);
+    throw new ApiError('Job not found', 404);
   }
 
   // Increment view count
@@ -151,7 +151,7 @@ export const createJob = async (req: AuthRequest, res: Response) => {
   });
 
   if (!user?.company) {
-    throw new AppError('Company profile required to post jobs', 400);
+    throw new ApiError('Company profile required to post jobs', 400);
   }
 
   const job = await prisma.job.create({
@@ -197,11 +197,11 @@ export const updateJob = async (req: AuthRequest, res: Response) => {
   });
 
   if (!existingJob) {
-    throw new AppError('Job not found', 404);
+    throw new ApiError('Job not found', 404);
   }
 
   if (existingJob.company.user.id !== req.user!.id) {
-    throw new AppError('Not authorized to update this job', 403);
+    throw new ApiError('Not authorized to update this job', 403);
   }
 
   const job = await prisma.job.update({
@@ -235,11 +235,11 @@ export const deleteJob = async (req: AuthRequest, res: Response) => {
   });
 
   if (!existingJob) {
-    throw new AppError('Job not found', 404);
+    throw new ApiError('Job not found', 404);
   }
 
   if (existingJob.company.user.id !== req.user!.id) {
-    throw new AppError('Not authorized to delete this job', 403);
+    throw new ApiError('Not authorized to delete this job', 403);
   }
 
   await prisma.job.delete({
@@ -263,7 +263,7 @@ export const getCompanyJobs = async (req: AuthRequest, res: Response) => {
   });
 
   if (!user?.company) {
-    throw new AppError('Company profile not found', 404);
+    throw new ApiError('Company profile not found', 404);
   }
 
   const [jobs, total] = await Promise.all([

@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { PrismaClientValidationError, PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 import logger from '@/utils/logger';
 
 export const errorHandler = (
   error: Error,
-  req: Request,
+  req: Request, 
   res: Response,
+  next: any
 ) => {
   let statusCode = 500;
   let message = 'Internal server error';
@@ -23,7 +24,7 @@ export const errorHandler = (
   });
 
   // Handle different error types
-  if (error instanceof AppError) {
+  if (error instanceof ApiError) {
     statusCode = error.statusCode;
     message = error.message;
     details = error.details;
@@ -64,12 +65,15 @@ export const errorHandler = (
     details = undefined;
   }
 
-  res.status(statusCode).json({
-    success: false,
-    error: {
-      message,
-      ...(details && { details }),
-      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
-    }
-  });
+  // Ensure response is sent as JSON
+  if (!res.headersSent) {
+    res.status(statusCode).json({
+      success: false,
+      error: {
+        message,
+        ...(details && { details }),
+        ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+      }
+    });
+  }
 };

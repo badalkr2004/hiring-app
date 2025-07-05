@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { AppError } from "./AppError";
+import { ApiError } from "@/utils/ApiError";
 import { StringValue } from "ms";
 
 export interface TokenPayload {
@@ -10,7 +10,7 @@ export interface TokenPayload {
 
 export const generateAccessToken = (payload: TokenPayload): string => {
   if (!process.env.JWT_SECRET) {
-    throw new AppError("JWT secret not configured", 500);
+    throw new ApiError("JWT secret not configured", 500);
   }
 
   return jwt.sign(payload, process.env.JWT_SECRET, {
@@ -22,7 +22,7 @@ export const generateAccessToken = (payload: TokenPayload): string => {
 
 export const generateRefreshToken = (payload: TokenPayload): string => {
   if (!process.env.JWT_REFRESH_SECRET) {
-    throw new AppError("JWT refresh secret not configured", 500);
+    throw new ApiError("JWT refresh secret not configured", 500);
   }
 
   return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
@@ -34,12 +34,12 @@ export const generateRefreshToken = (payload: TokenPayload): string => {
 
 export const verifyRefreshToken = (token: string): TokenPayload => {
   if (!process.env.JWT_REFRESH_SECRET) {
-    throw new AppError("JWT refresh secret not configured", 500);
+    throw new ApiError("JWT refresh secret not configured", 500);
   }
 
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_SECRET) as TokenPayload;
   } catch (error) {
-    throw new AppError("Invalid refresh token", 401);
+    throw new ApiError("Invalid refresh token", 401);
   }
 };

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult, ValidationChain } from 'express-validator';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 
 export const validate = (validations: ValidationChain[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +14,7 @@ export const validate = (validations: ValidationChain[]) => {
         message: error.msg
       }));
 
-      throw new AppError('Validation failed', 400, errorMessages);
+      throw new ApiError('Validation failed', 400, errorMessages);
     }
 
     next();

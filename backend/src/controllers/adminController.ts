@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserRole } from '@prisma/client';
 import prisma from '@/config/database';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 import { AuthRequest } from '@/middleware/auth';
 
 export const getDashboardStats = async (req: AuthRequest, res: Response) => {
@@ -188,11 +188,11 @@ export const updateUserStatus = async (req: AuthRequest, res: Response) => {
   });
 
   if (!user) {
-    throw new AppError('User not found', 404);
+    throw new ApiError('User not found', 404);
   }
 
   if (user.role === UserRole.ADMIN) {
-    throw new AppError('Cannot modify admin users', 403);
+    throw new ApiError('Cannot modify admin users', 403);
   }
 
   const updatedUser = await prisma.user.update({
@@ -223,7 +223,7 @@ export const verifyCompany = async (req: AuthRequest, res: Response) => {
   });
 
   if (!company) {
-    throw new AppError('Company not found', 404);
+    throw new ApiError('Company not found', 404);
   }
 
   const updatedCompany = await prisma.company.update({
@@ -255,11 +255,11 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
   });
 
   if (!user) {
-    throw new AppError('User not found', 404);
+    throw new ApiError('User not found', 404);
   }
 
   if (user.role === UserRole.ADMIN) {
-    throw new AppError('Cannot delete admin users', 403);
+    throw new ApiError('Cannot delete admin users', 403);
   }
 
   await prisma.user.delete({

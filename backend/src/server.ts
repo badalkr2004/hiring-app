@@ -1,10 +1,10 @@
+import "express-async-errors";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
-import "express-async-errors";
 import dotenv from "dotenv";
 
 import { errorHandler } from "@/middleware/errorHandler";
@@ -95,7 +95,7 @@ app.use("/api/admin", adminRoutes);
 // 404 handler
 app.use(notFound);
 
-// Error handling middleware
+// Error handling middleware - must be last
 app.use(errorHandler);
 
 // Graceful shutdown

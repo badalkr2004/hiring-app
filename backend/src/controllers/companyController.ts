@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '@/config/database';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 import { AuthRequest } from '@/middleware/auth';
 
 export const getCompanies = async (req: Request, res: Response) => {
@@ -103,7 +103,7 @@ export const getCompanyById = async (req: Request, res: Response) => {
   });
 
   if (!company) {
-    throw new AppError('Company not found', 404);
+    throw new ApiError('Company not found', 404);
   }
 
   res.json({
@@ -122,7 +122,7 @@ export const updateCompany = async (req: AuthRequest, res: Response) => {
   });
 
   if (!user?.company) {
-    throw new AppError('Company profile not found', 404);
+    throw new ApiError('Company profile not found', 404);
   }
 
   const company = await prisma.company.update({

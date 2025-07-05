@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ApplicationStatus } from '@prisma/client';
 import prisma from '@/config/database';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 import { AuthRequest } from '@/middleware/auth';
 
 export const applyToJob = async (req: AuthRequest, res: Response) => {
@@ -15,11 +15,11 @@ export const applyToJob = async (req: AuthRequest, res: Response) => {
   });
 
   if (!job) {
-    throw new AppError('Job not found', 404);
+    throw new ApiError('Job not found', 404);
   }
 
   if (job.status !== 'ACTIVE') {
-    throw new AppError('Job is no longer accepting applications', 400);
+    throw new ApiError('Job is no longer accepting applications', 400);
   }
 
   // Check if user already applied
@@ -33,7 +33,7 @@ export const applyToJob = async (req: AuthRequest, res: Response) => {
   });
 
   if (existingApplication) {
-    throw new AppError('You have already applied to this job', 409);
+    throw new ApiError('You have already applied to this job', 409);
   }
 
   // Create application
@@ -135,7 +135,7 @@ export const getCompanyApplications = async (req: AuthRequest, res: Response) =>
   });
 
   if (!user?.company) {
-    throw new AppError('Company profile not found', 404);
+    throw new ApiError('Company profile not found', 404);
   }
 
   const where: any = {
@@ -218,11 +218,11 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
   });
 
   if (!application) {
-    throw new AppError('Application not found', 404);
+    throw new ApiError('Application not found', 404);
   }
 
   if (application.job.company.user.id !== req.user!.id) {
-    throw new AppError('Not authorized to update this application', 403);
+    throw new ApiError('Not authorized to update this application', 403);
   }
 
   const updatedApplication = await prisma.application.update({
@@ -295,7 +295,7 @@ export const getApplicationById = async (req: AuthRequest, res: Response) => {
   });
 
   if (!application) {
-    throw new AppError('Application not found', 404);
+    throw new ApiError('Application not found', 404);
   }
 
   // Check if user can access this application
@@ -313,7 +313,7 @@ export const getApplicationById = async (req: AuthRequest, res: Response) => {
     })); // User owns the company that posted the job
 
   if (!canAccess) {
-    throw new AppError('Not authorized to view this application', 403);
+    throw new ApiError('Not authorized to view this application', 403);
   }
 
   res.json({
@@ -330,15 +330,15 @@ export const withdrawApplication = async (req: AuthRequest, res: Response) => {
   });
 
   if (!application) {
-    throw new AppError('Application not found', 404);
+    throw new ApiError('Application not found', 404);
   }
 
   if (application.userId !== req.user!.id) {
-    throw new AppError('Not authorized to withdraw this application', 403);
+    throw new ApiError('Not authorized to withdraw this application', 403);
   }
 
   if (application.status === ApplicationStatus.HIRED) {
-    throw new AppError('Cannot withdraw a hired application', 400);
+    throw new ApiError('Cannot withdraw a hired application', 400);
   }
 
   await prisma.application.delete({

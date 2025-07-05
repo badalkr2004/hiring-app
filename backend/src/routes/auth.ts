@@ -14,17 +14,13 @@ const router = Router();
 
 // Register
 router.post('/register', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('firstName').trim().isLength({ min: 1 }).withMessage('First name is required'),
-  body('lastName').trim().isLength({ min: 1 }).withMessage('Last name is required'),
-  body('role').optional().isIn(['USER', 'COMPANY']).withMessage('Invalid role'),
-  body('companyName').optional().trim().isLength({ min: 1 }),
   validate([
     body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 6 }),
-    body('firstName').trim().isLength({ min: 1 }),
-    body('lastName').trim().isLength({ min: 1 })
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('firstName').trim().isLength({ min: 1 }).withMessage('First name is required'),
+    body('lastName').trim().isLength({ min: 1 }).withMessage('Last name is required'),
+    body('role').optional().isIn(['USER', 'COMPANY']).withMessage('Invalid role'),
+    body('companyName').optional().trim().isLength({ min: 1 })
   ])
 ], register);
 

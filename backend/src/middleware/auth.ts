@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@prisma/client';
 import prisma from '@/config/database';
-import { AppError } from '@/utils/AppError';
+import { ApiError } from '@/utils/ApiError';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -17,13 +17,13 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new AppError('Access token required', 401);
+      throw new ApiError('Access token required', 401);
     }
 
     const token = authHeader.substring(7);
     
     if (!process.env.JWT_SECRET) {
-      throw new AppError('JWT secret not configured', 500);
+      throw new ApiError('JWT secret not configured', 500);
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
@@ -40,11 +40,11 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     });
 
     if (!user) {
-      throw new AppError('User not found', 401);
+      throw new ApiError('User not found', 401);
     }
 
     if (!user.isActive) {
-      throw new AppError('Account is deactivated', 401);
+      throw new ApiError('Account is deactivated', 401);
     }
 
     req.user = {
@@ -56,7 +56,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      next(new AppError('Invalid token', 401));
+      next(new ApiError('Invalid token', 401));
     } else {
       next(error);
     }
@@ -66,11 +66,11 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 export const authorize = (...roles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new AppError('Authentication required', 401));
+      return next(new ApiError('Authentication required', 401));
     }
 
     if (!roles.includes(req.user.role)) {
-      return next(new AppError('Insufficient permissions', 403));
+      return next(new ApiError('Insufficient permissions', 403));
     }
 
     next();
