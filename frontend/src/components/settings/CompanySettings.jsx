@@ -9,7 +9,7 @@ const CompanySettings = () => {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
-  const { handleUpload , isUploadPending } = AddPhoto();
+  const { handleUpload } = AddPhoto();
 
   const { userData, isLoading } = useAuth(); // isLoading is used to show a loading spinner when the user details are being fetched
 

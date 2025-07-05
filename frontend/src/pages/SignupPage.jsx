@@ -78,11 +78,12 @@ const SignupPage = () => {
   }, [userData, navigate, isLoading]);
 
   const companySizes = [
-    "1-10 employees",
-    "11-50 employees",
-    "51-200 employees",
-    "201-500 employees",
-    "500+ employees",
+    "1-10",
+    "11-50",
+    "51-200",
+    "201-500",
+    "501-1000",
+    "1000+",
   ];
 
   const industries = [
@@ -238,10 +239,7 @@ const SignupPage = () => {
               {/* Company Info */}
               {formData.role === "COMPANY" && (
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-gray-700">
-                    Company Information
-                  </div>
-                  <div className="mb-4">
+                  <div className="mb-6">
                     <label className="block text-xs font-medium text-gray-600 mb-1">
                       Company Name
                     </label>
