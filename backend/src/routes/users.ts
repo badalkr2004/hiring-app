@@ -27,6 +27,7 @@ router.put(
       body("linkedIn").optional().trim(),
       body("github").optional().trim(),
       body("portfolio").optional().trim(),
+      body("avatar").optional().trim(),
     ]),
   ],
   updateProfile
