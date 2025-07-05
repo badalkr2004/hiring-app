@@ -26,10 +26,10 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoadings , setIsLoadings] = useState(false);
+  const [isLoadings, setIsLoadings] = useState(false);
   const [error, setError] = useState("");
 
-  const { setUserData, setTokens , userData , isLoading } = useAuth();
+  const { setUserData, setTokens, userData, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -51,11 +51,11 @@ const SignupPage = () => {
 
     try {
       const response = await api.post("/auth/register", formData);
-      if(response.success){
+      if (response.success) {
         setUserData(response.data.user);
         setTokens(response.data.accessToken);
         navigate("/");
-      }else {
+      } else {
         setError(response.message);
       }
     } catch (error) {
@@ -71,8 +71,8 @@ const SignupPage = () => {
   };
 
   useEffect(() => {
-    if(isLoading) return;
-    if(userData) {
+    if (isLoading) return;
+    if (userData) {
       navigate("/");
     }
   }, [userData, navigate, isLoading]);
@@ -109,10 +109,12 @@ const SignupPage = () => {
           <span className="text-3xl font-bold text-gray-900">JobFlow</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
-          Hire Top Talent <br /> with <span className="text-blue-600">JobFlow</span>
+          Hire Top Talent <br /> with{" "}
+          <span className="text-blue-600">JobFlow</span>
         </h1>
         <p className="text-lg text-gray-600 mb-8 max-w-xl">
-          Post jobs, manage applicants, and grow your team with ease. Connect with thousands of candidates and top companies on JobFlow.
+          Post jobs, manage applicants, and grow your team with ease. Connect
+          with thousands of candidates and top companies on JobFlow.
         </p>
         <div className="flex flex-col sm:flex-row gap-6 w-full max-w-xl">
           <div className="flex-1 bg-white rounded-2xl shadow p-6 flex items-center space-x-4">
@@ -120,7 +122,9 @@ const SignupPage = () => {
               <Briefcase className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <div className="font-bold text-lg text-gray-900">10,000+ Candidates</div>
+              <div className="font-bold text-lg text-gray-900">
+                10,000+ Candidates
+              </div>
               <div className="text-gray-500 text-sm">Active job seekers</div>
             </div>
           </div>
@@ -129,7 +133,9 @@ const SignupPage = () => {
               <Building className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <div className="font-bold text-lg text-gray-900">500+ Companies</div>
+              <div className="font-bold text-lg text-gray-900">
+                500+ Companies
+              </div>
               <div className="text-gray-500 text-sm">Top employers</div>
             </div>
           </div>
@@ -139,14 +145,18 @@ const SignupPage = () => {
       <div className="flex flex-1 items-center justify-center py-12 px-4 sm:px-8 bg-transparent">
         <div className="w-full max-w-xl">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Create Your Account</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+              Create Your Account
+            </h2>
             <p className="mb-6 text-sm text-gray-600 text-center">
               Sign up to start hiring or finding jobs
             </p>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Role Selection */}
               <div>
-                <div className="mb-2 text-sm font-semibold text-gray-700">Sign up as</div>
+                <div className="mb-2 text-sm font-semibold text-gray-700">
+                  Sign up as
+                </div>
                 <div className="flex space-x-4 justify-center">
                   <button
                     type="button"
@@ -178,23 +188,31 @@ const SignupPage = () => {
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">First Name</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      First Name
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.firstName}
-                      onChange={(e) => handleInputChange("firstName", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("firstName", e.target.value)
+                      }
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                       placeholder="Enter your first name"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Last Name</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Last Name
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.lastName}
-                      onChange={(e) => handleInputChange("lastName", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("lastName", e.target.value)
+                      }
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                       placeholder="Enter your last name"
                     />
@@ -202,7 +220,9 @@ const SignupPage = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Email Address</label>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Email Address
+                </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
@@ -216,26 +236,36 @@ const SignupPage = () => {
                 </div>
               </div>
               {/* Company Info */}
-              {formData.role === "company" && (
+              {formData.role === "COMPANY" && (
                 <div>
-                  <div className="mb-2 text-sm font-semibold text-gray-700">Company Information</div>
+                  <div className="mb-2 text-sm font-semibold text-gray-700">
+                    Company Information
+                  </div>
                   <div className="mb-4">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Company Name</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Company Name
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.companyName}
-                      onChange={(e) => handleInputChange("companyName", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("companyName", e.target.value)
+                      }
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                       placeholder="Enter your company name"
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Company Size</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Company Size
+                      </label>
                       <select
                         value={formData.companySize}
-                        onChange={(e) => handleInputChange("companySize", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("companySize", e.target.value)
+                        }
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                       >
                         <option value="">Select company size</option>
@@ -247,10 +277,14 @@ const SignupPage = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">Industry</label>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Industry
+                      </label>
                       <select
                         value={formData.industry}
-                        onChange={(e) => handleInputChange("industry", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("industry", e.target.value)
+                        }
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                       >
                         <option value="">Select industry</option>
@@ -268,14 +302,18 @@ const SignupPage = () => {
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Password</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Password
+                    </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
                         type={showPassword ? "text" : "password"}
                         required
                         value={formData.password}
-                        onChange={(e) => handleInputChange("password", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("password", e.target.value)
+                        }
                         className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                         placeholder="Create password"
                       />
@@ -293,7 +331,9 @@ const SignupPage = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Confirm Password</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Confirm Password
+                    </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
@@ -306,7 +346,9 @@ const SignupPage = () => {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                       >
                         {showConfirmPassword ? (
@@ -326,21 +368,27 @@ const SignupPage = () => {
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <span className="ml-2 text-sm text-gray-600">
-                  I agree to the{' '}
-                  <Link to="/terms" className="text-blue-600 hover:text-blue-500">
+                  I agree to the{" "}
+                  <Link
+                    to="/terms"
+                    className="text-blue-600 hover:text-blue-500"
+                  >
                     Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    to="/privacy"
+                    className="text-blue-600 hover:text-blue-500"
+                  >
                     Privacy Policy
                   </Link>
                 </span>
               </div>
               {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={isLoadings || isLoading}
@@ -349,10 +397,13 @@ const SignupPage = () => {
                 {isLoadings ? "Creating account..." : "Create Account"}
               </button>
             </form>
-            
+
             <div className="mt-6 text-center text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-blue-600 hover:text-blue-500 font-medium"
+              >
                 Sign in here
               </Link>
             </div>
