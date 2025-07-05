@@ -245,7 +245,7 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json(new ApiError("user not found", 404));
     }
 
     // 3. Compare current password
@@ -272,6 +272,6 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
     console.error("Change Password Error:", err);
     return res
       .status(500)
-      .json({ success: false, message: "Internal server error" });
+      .json(new ApiError("Failed to change the password", 400));
   }
 };
