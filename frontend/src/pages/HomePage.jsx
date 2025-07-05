@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp, Users, Building, MapPin } from "lucide-react";
 import SearchBar from "../components/SearchBar";
 import JobList from "../components/JobList";
-import { useJobs } from "../hooks/useJobs";
+import { api } from "../libs/apis";
+// Make sure this path is correct
 
 const HomePage = () => {
   const [filters, setFilters] = useState({
@@ -12,8 +13,33 @@ const HomePage = () => {
     category: "",
     salaryRange: "",
   });
+  const [jobs, setJobs] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data: jobs = [], isLoading } = useJobs(filters);
+  // Fetch jobs from API when filters change
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setIsLoading(true);
+      try {
+        // Build query params from filters
+        const params = {};
+        if (filters.search) params.search = filters.search;
+        if (filters.location) params.location = filters.location;
+        if (filters.type && filters.type !== "all") params.type = filters.type;
+        if (filters.category && filters.category !== "all")
+          params.category = filters.category;
+        // Add pagination, sorting if needed
+
+        const res = await api.get("/jobs", { params });
+        console.log(res.data.jobs);
+        setJobs(res.data?.jobs || []);
+      } catch (err) {
+        setJobs([]);
+      }
+      setIsLoading(false);
+    };
+    fetchJobs();
+  }, [filters]);
 
   const stats = [
     {

@@ -39,7 +39,7 @@ const JobCard = ({ job }) => {
                   ? job.title.slice(0, 20) + "..."
                   : job.title}
               </h3>
-              <p className="text-gray-600">{job.company}</p>
+              <p className="text-gray-600">{job.company.name}</p>
             </div>
           </div>
           {job.featured && (
@@ -53,9 +53,10 @@ const JobCard = ({ job }) => {
         <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
           <div className="flex items-center space-x-1">
             <MapPin className="h-4 w-4" />
-            <span>{job.location.length > 10
-                  ? job.location.slice(0, 10) + "..."
-                  : job.location}
+            <span>
+              {job.location.length > 10
+                ? job.location.slice(0, 10) + "..."
+                : job.location}
             </span>
           </div>
           <div className="flex items-center space-x-1">
