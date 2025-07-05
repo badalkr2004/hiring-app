@@ -2,7 +2,11 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { validate } from "@/middleware/validation";
 import { authenticate } from "@/middleware/auth";
-import { updateProfile, uploadAvatar } from "@/controllers/userController";
+import {
+  updateProfile,
+  uploadAvatar,
+  uploadResume,
+} from "@/controllers/userController";
 
 const router = Router();
 
@@ -33,6 +37,11 @@ router.post(
   "/avatar",
   [authenticate, validate([body("url").isURL().withMessage("Invalid URL")])],
   uploadAvatar
+);
+router.post(
+  "/upload-resume",
+  [authenticate, validate([body("url").isURL().withMessage("Invalid URL")])],
+  uploadResume
 );
 
 export default router;

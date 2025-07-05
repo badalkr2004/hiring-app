@@ -72,5 +72,26 @@ export const uploadAvatar = async (req: AuthRequest, res: Response) => {
   res.json({
     success: true,
     message: "Avatar updated successfully",
+    data: {
+      avatar: req.body.url, // Return the updated avatar URL
+    },
+  });
+};
+
+export const uploadResume = async (req: AuthRequest, res: Response) => {
+  if (!req.body.url) {
+    throw new ApiError("Resume URL is required", 400);
+  }
+
+  await prisma.user.update({
+    where: { id: req.user!.id },
+    data: {
+      resume: req.body.url, // Assuming req.file.path contains the URL of the uploaded resume
+    },
+  });
+
+  res.json({
+    success: true,
+    message: "Resume uploaded successfully",
   });
 };
