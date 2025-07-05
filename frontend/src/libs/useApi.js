@@ -1,13 +1,9 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { api } from './apis';
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api } from "./apis";
+import { CLOUD_NAME } from "../config/api";
 
 export function useApiQuery(key, endpoint, options = {}) {
-  const {
-    params,
-    token,
-    queryOptions = {},
-    queryFnOverride,
-  } = options;
+  const { params, token, queryOptions = {}, queryFnOverride } = options;
 
   return useQuery({
     queryKey: Array.isArray(key) ? key : [key, params],
@@ -20,13 +16,8 @@ export function useApiQuery(key, endpoint, options = {}) {
   });
 }
 
-export function useApiMutation(method = 'post', endpoint, options = {}) {
-  const {
-    params,
-    token,
-    mutationOptions = {},
-    mutationFnOverride,
-  } = options;
+export function useApiMutation(method = "post", endpoint, options = {}) {
+  const { params, token, mutationOptions = {}, mutationFnOverride } = options;
 
   return useMutation({
     mutationFn: mutationFnOverride
@@ -36,4 +27,58 @@ export function useApiMutation(method = 'post', endpoint, options = {}) {
   });
 }
 
- 
+export function AddPhoto(cloudName = CLOUD_NAME) {
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const mutation = useMutation({
+    mutationFn: (data) => {
+      return fetch(url, {
+        method: "POST",
+        body: data,
+      });
+    },
+  });
+  return {
+    handleUpload: async (data) => {
+      try {
+        const res = await mutation.mutateAsync(data);
+        const response = await res.json();
+        return response;
+      } catch (err) {
+        console.log(err);
+        return {
+          success: false,
+          error: "something wents wrong.",
+        };
+      }
+    },
+    isUploadPending: mutation.isPending,
+  };
+}
+
+export function AddResume(cloudName = CLOUD_NAME) {
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+  const mutation = useMutation({
+    mutationFn: (data) => {
+      return fetch(url, {
+        method: "POST",
+        body: data,
+      });
+    },
+  });
+  return {
+    handleResumeUpload: async (data) => {
+      try {
+        const res = await mutation.mutateAsync(data);
+        const response = await res.json();
+        return response;
+      } catch (err) {
+        console.log(err);
+        return {
+          success: false,
+          error: "something wents wrong.",
+        };
+      }
+    },
+    isResumeUploadPending: mutation.isPending,
+  };
+}

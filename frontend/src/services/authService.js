@@ -55,7 +55,7 @@ const mockCompanies = [
 
 export const authService = {
   async login(email, password) {
-    await delay(800);
+    
 
     const user = mockUsers.find((u) => u.email === email);
     if (!user) {

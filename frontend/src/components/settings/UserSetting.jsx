@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { userSettingsService } from '../../services/userSettingsService';
+import { api } from '../../libs/apis';
+import { AddPhoto, AddResume } from '../../libs/useApi';
 
 const UserSettings = () => {
     const { userData, setUserData, accessToken } = useAuth();
     const [activeTab, setActiveTab] = useState('profile');
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
-
+    const [updateLoading, setUpdateLoading] = useState(false);
     // Profile form state
     const [profileForm, setProfileForm] = useState({
         firstName: '',
@@ -19,9 +21,11 @@ const UserSettings = () => {
         skills: '',
         experience: '',
         education: '',
-        linkedin: '',
+        linkedIn: '',
         github: '',
-        portfolio: ''
+        portfolio: '',
+        avatar: '',
+        resume: ''  
     });
 
     // Password form state
@@ -29,15 +33,6 @@ const UserSettings = () => {
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
-    });
-
-    // Notification preferences
-    const [notifications, setNotifications] = useState({
-        emailNotifications: true,
-        jobAlerts: true,
-        applicationUpdates: true,
-        marketingEmails: false,
-        weeklyDigest: true
     });
 
     // Resume upload state
@@ -60,14 +55,19 @@ const UserSettings = () => {
                 skills: userData.skills ? userData.skills.join(', ') : '',
                 experience: userData.experience || '',
                 education: userData.education || '',
-                linkedin: userData.linkedin || '',
+                linkedIn: userData.linkedIn || '',
                 github: userData.github || '',
-                portfolio: userData.portfolio || ''
+                portfolio: userData.portfolio || '',
+                avatar: userData.avatar || '',
+                resume: userData.resumeUrl || ''
             });
             setResumeUrl(userData.resumeUrl || '');
             setAvatarUrl(userData.avatarUrl || '');
         }
     }, [userData]);
+
+    const { handleUpload, isUploadPending } = AddPhoto();
+    const { handleResumeUpload, isResumeUploadPending } = AddResume();
 
     const handleProfileUpdate = async (e) => {
         e.preventDefault();
@@ -75,12 +75,13 @@ const UserSettings = () => {
         setMessage({ type: '', text: '' });
 
         try {
+            setUpdateLoading(true);
             const updateData = {
                 ...profileForm,
                 skills: profileForm.skills.split(',').map(skill => skill.trim()).filter(skill => skill)
             };
 
-            const response = await userSettingsService.updateProfile(updateData, accessToken);
+            const response = await api.put('/users/profile', updateData, { token: accessToken });
 
             if (response.success) {
                 setUserData({ ...userData, ...response.data.user });
@@ -91,7 +92,7 @@ const UserSettings = () => {
         } catch (error) {
             setMessage({ type: 'error', text: 'Failed to update profile' });
         } finally {
-            setIsLoading(false);
+            setUpdateLoading(false);
         }
     };
 
@@ -107,10 +108,10 @@ const UserSettings = () => {
         }
 
         try {
-            const response = await userSettingsService.changePassword({
+            const response = await api.post('/auth/change-password', {
                 currentPassword: passwordForm.currentPassword,
                 newPassword: passwordForm.newPassword
-            }, accessToken);
+            }, { token: accessToken });
 
             if (response.success) {
                 setMessage({ type: 'success', text: 'Password changed successfully!' });
@@ -125,50 +126,30 @@ const UserSettings = () => {
         }
     };
 
-    const handleResumeUpload = async (e) => {
+    const handleResumeUploadFunc = async (e) => {
         e.preventDefault();
         if (!resumeFile) {
             setMessage({ type: 'error', text: 'Please select a file to upload' });
             return;
         }
 
-        setIsLoading(true);
         setMessage({ type: '', text: '' });
 
         try {
-            const response = await userSettingsService.uploadResume(resumeFile, accessToken);
+            const formData = new FormData();
+            formData.append('file', resumeFile);
+            formData.append('upload_preset', 'c7rtf3gv');
+            formData.append('resource_type', 'auto');
+            const response = await handleResumeUpload(formData);
+            setResumeUrl(response.url);
+            setUserData({ ...userData, resume: response.url });
+            await api.put('/users/profile', {resume: response.url }, { token: accessToken });
+            setMessage({ type: 'success', text: 'Resume uploaded successfully!' });
+            setResumeFile(null);
 
-            if (response.success) {
-                setResumeUrl(response.data.resumeUrl);
-                setUserData({ ...userData, resumeUrl: response.data.resumeUrl });
-                setMessage({ type: 'success', text: 'Resume uploaded successfully!' });
-                setResumeFile(null);
-            } else {
-                setMessage({ type: 'error', text: response.message });
-            }
         } catch (error) {
+            console.log(error);
             setMessage({ type: 'error', text: 'Failed to upload resume' });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleNotificationUpdate = async () => {
-        setIsLoading(true);
-        setMessage({ type: '', text: '' });
-
-        try {
-            const response = await userSettingsService.updateNotifications(notifications, accessToken);
-
-            if (response.success) {
-                setMessage({ type: 'success', text: 'Notification preferences updated!' });
-            } else {
-                setMessage({ type: 'error', text: response.message });
-            }
-        } catch (error) {
-            setMessage({ type: 'error', text: 'Failed to update notifications' });
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -178,25 +159,18 @@ const UserSettings = () => {
             setMessage({ type: 'error', text: 'Please select an image to upload' });
             return;
         }
-
-        setIsLoading(true);
-        setMessage({ type: '', text: '' });
-
         try {
-            const response = await userSettingsService.uploadAvatar(avatarFile, accessToken);
-
-            if (response.success) {
-                setAvatarUrl(response.data.avatarUrl);
-                setUserData({ ...userData, avatarUrl: response.data.avatarUrl });
-                setMessage({ type: 'success', text: 'Avatar uploaded successfully!' });
-                setAvatarFile(null);
-            } else {
-                setMessage({ type: 'error', text: response.message });
-            }
+            setMessage({ type: '', text: '' });
+            const formData = new FormData();
+            formData.append('file', avatarFile);
+            formData.append('upload_preset', 'c7rtf3gv');
+            const response = await handleUpload(formData);
+            setAvatarUrl(response.url);
+            setUserData({ ...userData, avatar: response.url });
+            setMessage({ type: 'success', text: 'Avatar uploaded successfully!' });
+            setAvatarFile(null);
         } catch (error) {
             setMessage({ type: 'error', text: 'Failed to upload avatar' });
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -326,8 +300,8 @@ const UserSettings = () => {
                                     <div className="flex items-center space-x-8">
                                         <div className="flex-shrink-0">
                                             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center overflow-hidden shadow-lg border-4 border-white">
-                                                {avatarUrl ? (
-                                                    <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                                                {userData.avatar || avatarUrl ? (
+                                                    <img src={userData.avatar ?? avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <span className="text-white text-3xl">👤</span>
                                                 )}
@@ -343,17 +317,17 @@ const UserSettings = () => {
                                                         <input
                                                             type="file"
                                                             accept="image/*"
-                                                            onChange={(e) => setAvatarFile(e.target.files[0])}
+                                                            onChange={(e) => {setAvatarFile(e.target.files[0]); setAvatarUrl(URL.createObjectURL(e.target.files[0]))}}
                                                             className="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 transition-colors duration-200"
                                                         />
                                                     </div>
                                                 </div>
                                                 <button
                                                     type="submit"
-                                                    disabled={!avatarFile || isLoading}
+                                                    disabled={!avatarFile || isUploadPending}
                                                     className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                                                 >
-                                                    {isLoading ? 'Uploading...' : 'Upload Avatar'}
+                                                    {isUploadPending ? 'Uploading...' : 'Upload Avatar'}
                                                 </button>
                                             </form>
                                         </div>
@@ -462,8 +436,8 @@ const UserSettings = () => {
                                             <label className="block text-sm font-semibold text-gray-700">LinkedIn</label>
                                             <input
                                                 type="url"
-                                                value={profileForm.linkedin}
-                                                onChange={(e) => setProfileForm({...profileForm, linkedin: e.target.value})}
+                                                value={profileForm.linkedIn}
+                                                onChange={(e) => setProfileForm({...profileForm, linkedIn: e.target.value})}
                                                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
                                                 placeholder="https://linkedin.com/in/username"
                                             />
@@ -493,10 +467,10 @@ const UserSettings = () => {
                                     <div className="flex justify-end pt-6">
                                         <button
                                             type="submit"
-                                            disabled={isLoading}
+                                            disabled={updateLoading}
                                             className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold"
                                         >
-                                            {isLoading ? 'Updating...' : 'Update Profile'}
+                                            {updateLoading ? 'Updating...' : 'Update Profile'}
                                         </button>
                                     </div>
                                 </form>
@@ -511,20 +485,19 @@ const UserSettings = () => {
                                         <span className="mr-3 text-2xl">📄</span>
                                         Resume Upload
                                     </h3>
-                                    
-                                    {resumeUrl && (
+                                    {(userData.resume || resumeUrl) && (
                                         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
                                             <p className="text-green-800 flex items-center">
                                                 <span className="mr-2">✅</span>
                                                 <strong>Current Resume:</strong> 
-                                                <a href={resumeUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 hover:underline font-medium">
+                                                <a href={userData.resume ?? resumeUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 hover:underline font-medium">
                                                     View Resume
                                                 </a>
                                             </p>
                                         </div>
                                     )}
 
-                                    <form onSubmit={handleResumeUpload} className="space-y-6">
+                                    <form onSubmit={handleResumeUploadFunc} className="space-y-6">
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-3">
                                                 Upload Resume (PDF, DOC, DOCX)
@@ -533,17 +506,17 @@ const UserSettings = () => {
                                                 <input
                                                     type="file"
                                                     accept=".pdf,.doc,.docx"
-                                                    onChange={(e) => setResumeFile(e.target.files[0])}
+                                                    onChange={(e) => {setResumeFile(e.target.files[0]); setResumeUrl(URL.createObjectURL(e.target.files[0]))}}
                                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-green-500 file:text-white hover:file:bg-green-600 transition-colors duration-200"
                                                 />
                                             </div>
                                         </div>
                                         <button
                                             type="submit"
-                                            disabled={!resumeFile || isLoading}
+                                            disabled={!resumeFile || isResumeUploadPending}
                                             className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-blue-700 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                                         >
-                                            {isLoading ? 'Uploading...' : 'Upload Resume'}
+                                            {isResumeUploadPending ? 'Uploading...' : 'Upload Resume'}
                                         </button>
                                     </form>
                                 </div>

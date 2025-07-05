@@ -20,8 +20,13 @@ async function apiRequest(endpoint, options = {}) {
     ...headers,
   };
 
+  // check if token is avaliable in local storage
+  const tokenAvailable = localStorage.getItem("accessToken");
+
   if (token) {
     finalHeaders["Authorization"] = `Bearer ${token}`;
+  } else if (tokenAvailable) {
+    finalHeaders["Authorization"] = `Bearer ${tokenAvailable}`;
   }
 
   try {
