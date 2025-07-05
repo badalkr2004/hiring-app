@@ -8,6 +8,7 @@ import {
   refreshToken,
   logout,
   getProfile,
+  changePassword,
 } from "@/controllers/authController";
 
 const router = Router();
@@ -67,5 +68,21 @@ router.post("/logout", authenticate, logout);
 
 // Get profile
 router.get("/profile", authenticate, getProfile);
+
+// Change password
+
+router.post(
+  "/change-password",
+  authenticate,
+  [
+    body("currentPassword")
+      .notEmpty()
+      .withMessage("Current password is required"),
+    body("newPassword")
+      .isLength({ min: 6 })
+      .withMessage("New password must be at least 6 characters"),
+  ],
+  changePassword
+);
 
 export default router;
