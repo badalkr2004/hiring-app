@@ -4,10 +4,10 @@ import { useAuth } from "../contexts/AuthContext";
 
 const ProtectedRoute = ({
   children,
-  allowedRoles = ["user", "company", "admin"],
+  allowedRoles = ["USER", "COMPANY", "ADMIN"],
   redirectTo = "/login",
 }) => {
-  const { user, isLoading } = useAuth();
+  const { userData, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -17,11 +17,11 @@ const ProtectedRoute = ({
     );
   }
 
-  if (!user) {
+  if (!userData) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(userData.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

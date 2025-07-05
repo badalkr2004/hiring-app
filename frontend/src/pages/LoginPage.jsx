@@ -1,36 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, Briefcase } from "lucide-react";
-import { useApiMutation } from "../libs/useApi";
 import { useAuth } from "../contexts/AuthContext";
+import { api } from "../libs/apis";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);  
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const { setUserData, setTokens } = useAuth();
+  const { setUserData, setTokens , isLoading , userData } = useAuth(); 
   const navigate = useNavigate();
-  const { mutate, isPending } = useApiMutation('post', '/auth/login');
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    mutate(formData, {
-      onSuccess: (data) => {
-        if(data.success){
-          setUserData(data.data.user);
-          setTokens(data.data.accessToken);
-          navigate("/");
-        }
-      },
-      onError: (error) => {
-        console.log(error);
-        setError(error.message);
-      },
-    });
+    try {
+      e.preventDefault();
+      setIsPending(true);
+      const response = await api.post("/auth/login", formData);
+      if (response.success) {
+        setUserData(response.data.user);
+        setTokens(response.data.accessToken);
+        navigate("/");
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsPending(false);
+    }
   };
+
+  useEffect(() => {
+    if(isLoading) return;
+    if(userData) {
+      navigate("/");
+    }
+  }, [userData, navigate, isLoading]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -51,7 +60,7 @@ const LoginPage = () => {
                 JobFlow
               </span>
             </Link>
-            
+
             <div className="space-y-4">
               <h1 className="text-5xl font-bold text-gray-900 leading-tight">
                 Find Your Dream
@@ -60,7 +69,8 @@ const LoginPage = () => {
                 </span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Connect with top companies and discover opportunities that match your skills and aspirations.
+                Connect with top companies and discover opportunities that match
+                your skills and aspirations.
               </p>
             </div>
           </div>
@@ -78,7 +88,9 @@ const LoginPage = () => {
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-3">
                 <Briefcase className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="font-semibold text-gray-900 mb-1">500+ Companies</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">
+                500+ Companies
+              </h3>
               <p className="text-sm text-gray-600">Top employers</p>
             </div>
           </div>
@@ -103,41 +115,43 @@ const LoginPage = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Email Address
                 </label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 duration-200 text-black" />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
                     placeholder="Enter your email"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
                   Password
                 </label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 duration-200 text-black" />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
                     value={formData.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
-                    className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
-                    placeholder="Enter your password"
+                    onChange={(e) =>
+                      handleInputChange("password", e.target.value)
+                    }
+                    className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50"
+                    placeholder="Create password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5" />
@@ -166,7 +180,7 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                disabled={isPending}
+                disabled={isPending || isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {isPending ? "Signing in..." : "Sign In"}

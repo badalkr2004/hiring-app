@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Eye,
@@ -10,6 +10,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { api } from "../libs/apis";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,7 @@ const SignupPage = () => {
     password: "",
     firstName: "",
     lastName: "",
-    role: "user",
+    role: "USER",
     companyName: "",
     companySize: "",
     industry: "",
@@ -25,36 +26,42 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadings , setIsLoadings] = useState(false);
   const [error, setError] = useState("");
 
-  const { signup } = useAuth();
+  const { setUserData, setTokens , userData , isLoading } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsLoadings(true);
     setError("");
 
     if (formData.password !== confirmPassword) {
       setError("Passwords do not match");
-      setIsLoading(false);
+      setIsLoadings(false);
       return;
     }
 
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
-      setIsLoading(false);
+      setIsLoadings(false);
       return;
     }
 
     try {
-      await signup(formData);
-      navigate("/dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed");
+      const response = await api.post("/auth/register", formData);
+      if(response.success){
+        setUserData(response.data.user);
+        setTokens(response.data.accessToken);
+        navigate("/");
+      }else {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError(error.message);
     } finally {
-      setIsLoading(false);
+      setIsLoadings(false);
     }
   };
 
@@ -62,6 +69,13 @@ const SignupPage = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError("");
   };
+
+  useEffect(() => {
+    if(isLoading) return;
+    if(userData) {
+      navigate("/");
+    }
+  }, [userData, navigate, isLoading]);
 
   const companySizes = [
     "1-10 employees",
@@ -85,9 +99,9 @@ const SignupPage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row  bg-blue-100">
+    <div className="min-h-screen flex flex-col md:flex-row bg-blue-100 px-2 md:px-10">
       {/* Left Side: Branding & Features */}
-      <div className="flex flex-col justify-center items-start w-full md:w-1/2 px-8 md:px-16 py-12">
+      <div className="hidden md:flex flex-col justify-start items-start w-full md:w-1/2 px-8 ml-6 mt-6 md:px-8 py-8 md:pt-16">
         <div className="flex items-center mb-8">
           <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center shadow-md mr-4">
             <Briefcase className="h-8 w-8 text-white" />
@@ -123,17 +137,12 @@ const SignupPage = () => {
       </div>
       {/* Right Side: Signup Form */}
       <div className="flex flex-1 items-center justify-center py-12 px-4 sm:px-8 bg-transparent">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-xl">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Create Your Account</h2>
             <p className="mb-6 text-sm text-gray-600 text-center">
               Sign up to start hiring or finding jobs
             </p>
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Role Selection */}
               <div>
@@ -141,9 +150,9 @@ const SignupPage = () => {
                 <div className="flex space-x-4 justify-center">
                   <button
                     type="button"
-                    onClick={() => handleInputChange("role", "user")}
+                    onClick={() => handleInputChange("role", "USER")}
                     className={`flex flex-col items-center px-6 py-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                      formData.role === "user"
+                      formData.role === "USER"
                         ? "border-blue-500 bg-blue-50 text-blue-700 shadow"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -153,7 +162,7 @@ const SignupPage = () => {
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleInputChange("role", "company")}
+                    onClick={() => handleInputChange("role", "COMPANY")}
                     className={`flex flex-col items-center px-6 py-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                       formData.role === "company"
                         ? "border-blue-500 bg-blue-50 text-blue-700 shadow"
@@ -327,14 +336,20 @@ const SignupPage = () => {
                   </Link>
                 </span>
               </div>
+              {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoadings || isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-md"
               >
-                {isLoading ? "Creating account..." : "Create Account"}
+                {isLoadings ? "Creating account..." : "Create Account"}
               </button>
             </form>
+            
             <div className="mt-6 text-center text-sm text-gray-600">
               Already have an account?{' '}
               <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">

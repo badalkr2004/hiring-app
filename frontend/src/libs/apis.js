@@ -34,12 +34,19 @@ async function apiRequest(endpoint, options = {}) {
     const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error(responseData.message);
+      return {
+        success: false,
+        message: responseData.error.message || "Something went wrong",
+        status: response.status,
+      }
     }
 
     return responseData;
   } catch (err) {
-    throw err;
+    return {
+      success: false,
+      message: err.message || "Something went wrong",
+    };
   }
 }
 

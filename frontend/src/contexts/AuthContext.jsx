@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { API_BASE_URL } from "../config/api";
+import { api } from "../libs/apis";
 
 const AuthContext = createContext(null);
 
@@ -27,47 +27,41 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
   }, []);
 
-  const validateToken = useCallback(async () => {
-    if (!accessToken) {
+  const validateToken = useCallback(async (token) => {
+    if (!token) {
       clearTokens();
       return;
     }
 
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const response = await api.get("/auth/profile", {
+        token: token,
       });
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Token validation failed");
       }
 
-      const data = await response.json();
-      if (data.success) {
-        setUserData(data.data);
-      }else {
-        clearTokens();
-      }
+      setUserData(response.data.user);
+      setIsLoggedIn(true);
     } catch (error) {
       console.error("Token validation error:", error);
       clearTokens();
     } finally {
       setIsLoading(false);
     }
-  }, [accessToken, clearTokens]);
+  }, [clearTokens]);
 
   useEffect(() => {
     const storedAccess = localStorage.getItem("accessToken");
     if (storedAccess) {
       setAccessToken(storedAccess);
-      validateToken();
+      validateToken(storedAccess);
     }else {
       setIsLoggedIn(false);
       setUserData(null);
+      setIsLoading(false);
     }
   }, [validateToken]);
 

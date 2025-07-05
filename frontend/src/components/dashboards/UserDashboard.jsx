@@ -5,11 +5,11 @@ import { useAuth } from "../../contexts/AuthContext";
 import { applicationService } from "../../services/applicationService";
 
 const UserDashboard = () => {
-  const { user } = useAuth();
+  const { userData } = useAuth();
   const { data: applications = [], isLoading } = useQuery({
-    queryKey: ["user-applications", user?.id],
-    queryFn: () => applicationService.getApplicationsByUser(user.id),
-    enabled: !!user,
+    queryKey: ["user-applications", userData?.id],
+    queryFn: () => applicationService.getApplicationsByUser(userData.id),
+    enabled: !!userData,
   });
 
   const getStatusColor = (status) => {
@@ -78,7 +78,7 @@ const UserDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {user?.firstName}!
+            Welcome back {userData?.firstName}!
           </h1>
           <p className="text-gray-600 mt-2">
             Track your job applications and career progress

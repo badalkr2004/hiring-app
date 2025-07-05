@@ -5,16 +5,16 @@ import CompanyDashboard from '../components/dashboards/CompanyDashboard';
 import AdminDashboard from '../components/dashboards/AdminDashboard';
 
 const DashboardPage = () => {
-  const { user } = useAuth();
+  const { userData } = useAuth();
 
-  if (!user) return null;
+  if (!userData) return null;
 
-  switch (user.role) {
-    case 'user':
+  switch (userData.role) {
+    case 'USER':
       return <UserDashboard />;
-    case 'company':
+    case 'COMPANY':
       return <CompanyDashboard />;
-    case 'admin':
+    case 'ADMIN':
       return <AdminDashboard />;
     default:
       return <div>Invalid user role</div>;

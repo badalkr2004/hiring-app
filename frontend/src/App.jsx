@@ -16,6 +16,7 @@ import SignupPage from "./pages/SignupPage";
 import DashboardPage from "./pages/DashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { AuthProvider } from "./contexts/AuthContext";
+import SettingsPage from "./pages/SettingPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,15 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={["company", "admin"]}>
                     <PostJobPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "COMPANY", "ADMIN"]}>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />

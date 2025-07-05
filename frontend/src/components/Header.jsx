@@ -10,30 +10,31 @@ import {
   Settings,
   Menu,
   X,
+  Loader2,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { userData, clearTokens, isLoading } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    clearTokens();
     navigate("/");
     setShowUserMenu(false);
   };
 
   const navItems = [
     { path: "/", label: "Jobs", icon: Search },
-    { path: "/post-job", label: "Post Job", icon: Plus, requiresAuth: true },
+    { path: "/post-job", label: "Post Job", icon: Plus, requiresAuth: true, requiresRole: "EMPLOYER" },
     { path: "/companies", label: "Companies", icon: Users },
   ];
 
   const filteredNavItems = navItems.filter(
-    (item) => !item.requiresAuth || (item.requiresAuth && user)
+    (item) => !item.requiresAuth || (item.requiresAuth && userData && (userData.role === item.requiresRole || userData.role === "ADMIN"))
   );
 
   return (
@@ -74,7 +75,7 @@ const Header = () => {
 
           {/* Desktop User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            {user ? (
+            {userData && !isLoading ? (
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -82,11 +83,11 @@ const Header = () => {
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">
-                      {user.firstName[0]}
-                      {user.lastName[0]}
+                      {userData.firstName[0]}
+                      {userData.lastName[0]}
                     </span>
                   </div>
-                  <span className="font-medium">{user.firstName}</span>
+                  <span className="font-medium">{userData.firstName}</span>
                 </button>
 
                 {showUserMenu && (
@@ -100,12 +101,12 @@ const Header = () => {
                       <span>Dashboard</span>
                     </Link>
                     <Link
-                      to="/profile"
+                      to="/settings"
                       className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <Settings className="h-4 w-4" />
-                      <span>Profile</span>
+                      <span>Settings</span>
                     </Link>
                     <hr className="my-2" />
                     <button
@@ -118,8 +119,12 @@ const Header = () => {
                   </div>
                 )}
               </div>
+            ) : isLoading ? (
+              <div className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
             ) : (
-              <>
+              <div>
                 <Link
                   to="/login"
                   className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
@@ -132,7 +137,7 @@ const Header = () => {
                 >
                   Get Started
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
@@ -175,7 +180,7 @@ const Header = () => {
               })}
             </nav>
 
-            {user ? (
+            {userData && !isLoading ? (
               <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
                 <Link
                   to="/dashboard"
@@ -186,12 +191,12 @@ const Header = () => {
                   <span>Dashboard</span>
                 </Link>
                 <Link
-                  to="/profile"
+                  to="/settings"
                   className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
                   onClick={() => setShowMobileMenu(false)}
                 >
                   <Settings className="h-4 w-4" />
-                  <span>Profile</span>
+                  <span>Settings</span>
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -200,6 +205,10 @@ const Header = () => {
                   <LogOut className="h-4 w-4" />
                   <span>Sign Out</span>
                 </button>
+              </div>
+            ) : isLoading ? (
+              <div className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <Loader2 className="h-4 w-4 animate-spin" />
               </div>
             ) : (
               <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
