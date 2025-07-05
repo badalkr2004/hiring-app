@@ -4,7 +4,19 @@ import { ApiError } from "@/utils/ApiError";
 import { AuthRequest } from "@/middleware/auth";
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {
-  const { firstName, lastName, phone, location, skills, experience } = req.body;
+  const {
+    firstName,
+    lastName,
+    phone,
+    location,
+    skills,
+    experience,
+    bio,
+    education,
+    linkedIn,
+    github,
+    portfolio,
+  } = req.body;
 
   const user = await prisma.user.update({
     where: { id: req.user!.id },
@@ -15,6 +27,11 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       location,
       skills,
       experience,
+      bio,
+      education,
+      linkedIn,
+      github,
+      portfolio,
     },
     select: {
       id: true,
@@ -41,19 +58,14 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 };
 
 export const uploadAvatar = async (req: AuthRequest, res: Response) => {
-  if (!req.file) {
-    throw new ApiError("No file uploaded", 400);
-  }
-  console.log(req.user?.id, req.file.path);
-  // Update the user's avatar URL in the database
   await prisma.user.update({
     where: { id: req.user!.id },
-    data: { avatar: req.file.path },
+    data: {
+      avatar: req.body.url, // Assuming req.file.path contains the URL of the uploaded image
+    },
   });
-
   res.json({
     success: true,
-    message: "Avatar uploaded successfully",
-    data: { avatarUrl: req.file.path },
+    message: "Avatar updated successfully",
   });
 };

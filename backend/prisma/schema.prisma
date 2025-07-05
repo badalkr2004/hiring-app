@@ -11,27 +11,32 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  role      UserRole @default(USER)
-  avatar    String?
-  phone     String?
-  location  String?
-  skills    String[]
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  email      String    @unique
+  password   String
+  firstName  String
+  lastName   String
+  role       UserRole  @default(USER)
+  avatar     String?
+  phone      String?
+  location   String?
+  skills     String[]
   experience String?
-  resume    String?
-  isActive  Boolean  @default(true)
-  isVerified Boolean @default(false)
-  lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  resume     String?
+  bio        String?
+  education  String?
+  linkedIn   String?
+  github     String?
+  portfolio  String?
+  isActive   Boolean   @default(true)
+  isVerified Boolean   @default(false)
+  lastLogin  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   // Relations
-  applications Application[]
-  company      Company?
+  applications  Application[]
+  company       Company?
   refreshTokens RefreshToken[]
 
   @@map("users")
@@ -60,25 +65,25 @@ model Company {
 }
 
 model Job {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String
   requirements String[]
-  benefits    String[]
-  location    String
-  type        JobType
-  category    String
-  salary      String
-  status      JobStatus @default(ACTIVE)
-  featured    Boolean   @default(false)
-  views       Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  expiresAt   DateTime?
+  benefits     String[]
+  location     String
+  type         JobType
+  category     String
+  salary       String
+  status       JobStatus @default(ACTIVE)
+  featured     Boolean   @default(false)
+  views        Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  expiresAt    DateTime?
 
   // Relations
-  companyId String @db.ObjectId
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId    String        @db.ObjectId
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   applications Application[]
 
   @@map("jobs")

@@ -3,7 +3,6 @@ import { body } from "express-validator";
 import { validate } from "@/middleware/validation";
 import { authenticate } from "@/middleware/auth";
 import { updateProfile, uploadAvatar } from "@/controllers/userController";
-import { upload } from "@/utils/cloudinary"; // Assuming you have a cloudinary setup for file uploads
 
 const router = Router();
 
@@ -19,12 +18,21 @@ router.put(
       body("location").optional().trim(),
       body("skills").optional().isArray(),
       body("experience").optional().trim(),
+      body("bio").optional().trim(),
+      body("education").optional().trim(),
+      body("linkedIn").optional().trim(),
+      body("github").optional().trim(),
+      body("portfolio").optional().trim(),
     ]),
   ],
   updateProfile
 );
 
 // Upload avatar
-router.post("/avatar", authenticate, upload.single("avatar"), uploadAvatar);
+router.post(
+  "/avatar",
+  [authenticate, validate([body("url").isURL().withMessage("Invalid URL")])],
+  uploadAvatar
+);
 
 export default router;

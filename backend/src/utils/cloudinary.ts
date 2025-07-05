@@ -12,11 +12,13 @@ cloudinary.config({
 // Cloudinary storage setup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    // @ts-ignore
-    folder: "uploads", // optional folder name in cloudinary
-    allowed_formats: ["jpg", "png", "jpeg", "webp"],
-    transformation: [{ width: 500, height: 500, crop: "limit" }],
+  params: async (req, file) => {
+    // async code using `req` and `file`
+    // ...
+    return {
+      folder: "hiring-app/avatars",
+      format: ["jpeg", "png", "webp"],
+    };
   },
 });
 
