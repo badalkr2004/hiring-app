@@ -76,7 +76,7 @@ const PostJobPage = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
