@@ -17,6 +17,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     github,
     portfolio,
     avatar,
+    resume,
   } = req.body;
 
   const user = await prisma.user.update({
@@ -34,6 +35,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       github,
       portfolio,
       avatar,
+      resume,
     },
     select: {
       id: true,
@@ -54,6 +56,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       isActive: true,
       isVerified: true,
       createdAt: true,
+      resume: true,
       company: true,
     },
   });

@@ -28,6 +28,7 @@ router.put(
       body("github").optional().trim(),
       body("portfolio").optional().trim(),
       body("avatar").optional().trim(),
+      body("resume").optional().trim(),
     ]),
   ],
   updateProfile
