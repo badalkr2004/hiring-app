@@ -27,6 +27,7 @@ const PostJobPage = () => {
     description: "",
     requirements: [""],
     benefits: [""],
+    expiresAt: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]  ,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -81,6 +82,7 @@ const PostJobPage = () => {
           description: "",
           requirements: [""],
           benefits: [""],
+          expiresAt: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0],
         });
         setCurrentStep(1);
       } else {
@@ -508,6 +510,20 @@ const PostJobPage = () => {
                   </div>
                 </div>
 
+                {/* Expiration Date */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Expiration Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.expiresAt}
+                    onChange={(e) => handleInputChange("expiresAt", e.target.value)}
+                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg bg-white shadow-sm hover:shadow-md"
+                  />
+                </div>
+
+                {/* Submit Button */}
                 <div className="flex justify-between pt-8 border-t border-gray-200">
                   <button
                     type="button"

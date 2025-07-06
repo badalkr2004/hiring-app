@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Briefcase,
@@ -8,15 +8,20 @@ import {
   X,
   Clock,
   Plus,
+  MapPin,
+  DollarSign,
+  Tag,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { applicationService } from "../../services/applicationService";
-import { jobService } from "../../services/jobService";
+import { useApiQuery } from "../../libs/useApi";
 
 const CompanyDashboard = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [jobs, setJobs] = useState([]);
+  const navigate = useNavigate();
 
   const { data: applications = [], isLoading: applicationsLoading } = useQuery({
     queryKey: ["company-applications", user?.id],
@@ -24,11 +29,12 @@ const CompanyDashboard = () => {
     enabled: !!user,
   });
 
-  const { data: jobs = [], isLoading: jobsLoading } = useQuery({
-    queryKey: ["company-jobs", user?.id],
-    queryFn: () => jobService.getJobsByCompany(user.id),
-    enabled: !!user,
-  });
+  const { data: jobData = [], isLoading: jobsLoading } = useApiQuery(`/jobs/company/my-jobs`);
+  useEffect(() => {
+    if(jobData?.success) {
+      setJobs(jobData.data.jobs);
+    }
+  }, [jobData]);
 
   const updateApplicationMutation = useMutation({
     mutationFn: ({ applicationId, status }) =>
@@ -232,12 +238,18 @@ const CompanyDashboard = () => {
             )}
           </div>
 
-          {/* Active Jobs */}
+          {/* Recent Job Posts */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
-                Active Jobs
+                Recent Job Posts
               </h2>
+              <Link
+                to="/company/jobs"
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 font-medium text-sm shadow-sm"
+              >
+                View All Job Posts
+              </Link>
             </div>
 
             {jobsLoading ? (
@@ -268,32 +280,69 @@ const CompanyDashboard = () => {
                 </Link>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                {jobs
-                  .filter((job) => job.status === "active")
-                  .map((job) => (
-                    <div key={job.id} className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-900">
-                            {job.title}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {job.location} • {job.type}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {job.applicationsCount || 0} applications
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-sm text-gray-500">
-                            Posted{" "}
-                            {new Date(job.postedDate).toLocaleDateString()}
-                          </span>
-                        </div>
+              <div className="p-4 grid gap-6">
+                {jobs.slice(0, 2).map((job) => (
+                  <div
+                    key={job.id}
+                    className="cursor-pointer relative bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-6 flex flex-col gap-3 hover:shadow-lg transition-shadow duration-200"
+                    onClick={() => navigate(`/jobs/${job.id}`)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <h4 className="text-lg font-bold text-gray-900">
+                          {job.title}
+                        </h4>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          job.status === 'ACTIVE'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {job.status}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        Posted {new Date(job.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-4 mb-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <MapPin className="h-4 w-4" />
+                        <span>{job.location}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Briefcase className="h-4 w-4" />
+                        <span>{job.type}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Tag className="h-4 w-4" />
+                        <span>{job.category}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <DollarSign className="h-4 w-4" />
+                        <span>{job.salary}</span>
                       </div>
                     </div>
-                  ))}
+                    <div className="flex flex-wrap items-center justify-between text-sm text-gray-500 mt-2">
+                      <div className="flex gap-4">
+                        <span className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          <span>{job._count?.applications || 0} applications</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          <span>{job.views || 0} views</span>
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        {job.expiresAt && (
+                          <span className="text-xs text-orange-600 font-medium">
+                            Expires {new Date(job.expiresAt).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
