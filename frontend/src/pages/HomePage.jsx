@@ -33,7 +33,7 @@ const HomePage = () => {
         if (filters.salaryRange && filters.salaryRange !== "all")
           params.salaryRange = filters.salaryRange;
         // pagination
-        const limit = 10; // jobs per page
+        const limit = 9; // jobs per page
         params.page = page;
         params.limit = limit;
 
