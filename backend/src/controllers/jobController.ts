@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
-import { JobType, JobStatus } from '@prisma/client';
-import prisma from '@/config/database';
-import { ApiError } from '@/utils/ApiError';
-import { AuthRequest } from '@/middleware/auth';
+import { Request, Response } from "express";
+import { JobType, JobStatus } from "@prisma/client";
+import prisma from "@/config/database";
+import { ApiError } from "@/utils/ApiError";
+import { AuthRequest } from "@/middleware/auth";
 
 export const getJobs = async (req: Request, res: Response) => {
   const {
@@ -12,8 +12,8 @@ export const getJobs = async (req: Request, res: Response) => {
     category,
     page = 1,
     limit = 10,
-    sortBy = 'createdAt',
-    sortOrder = 'desc'
+    sortBy = "createdAt",
+    sortOrder = "desc",
   } = req.query;
 
   const skip = (Number(page) - 1) * Number(limit);
@@ -21,29 +21,31 @@ export const getJobs = async (req: Request, res: Response) => {
   // Build where clause
   const where: any = {
     status: JobStatus.ACTIVE,
-    expiresAt: {
-      gte: new Date()
-    }
+    // expiresAt: {
+    //   gte: new Date()
+    // }
   };
 
   if (search) {
     where.OR = [
-      { title: { contains: search as string, mode: 'insensitive' } },
-      { description: { contains: search as string, mode: 'insensitive' } },
-      { company: { name: { contains: search as string, mode: 'insensitive' } } }
+      { title: { contains: search as string, mode: "insensitive" } },
+      { description: { contains: search as string, mode: "insensitive" } },
+      {
+        company: { name: { contains: search as string, mode: "insensitive" } },
+      },
     ];
   }
 
   if (location) {
-    where.location = { contains: location as string, mode: 'insensitive' };
+    where.location = { contains: location as string, mode: "insensitive" };
   }
 
-  if (type && type !== 'all') {
+  if (type && type !== "all") {
     where.type = type as JobType;
   }
 
-  if (category && category !== 'all') {
-    where.category = { contains: category as string, mode: 'insensitive' };
+  if (category && category !== "all") {
+    where.category = { contains: category as string, mode: "insensitive" };
   }
 
   const [jobs, total] = await Promise.all([
@@ -55,22 +57,22 @@ export const getJobs = async (req: Request, res: Response) => {
             id: true,
             name: true,
             logo: true,
-            verified: true
-          }
+            verified: true,
+          },
         },
         _count: {
           select: {
-            applications: true
-          }
-        }
+            applications: true,
+          },
+        },
       },
       orderBy: {
-        [sortBy as string]: sortOrder as 'asc' | 'desc'
+        [sortBy as string]: sortOrder as "asc" | "desc",
       },
       skip,
-      take: Number(limit)
+      take: Number(limit),
     }),
-    prisma.job.count({ where })
+    prisma.job.count({ where }),
   ]);
 
   res.json({
@@ -81,9 +83,9 @@ export const getJobs = async (req: Request, res: Response) => {
         page: Number(page),
         limit: Number(limit),
         total,
-        pages: Math.ceil(total / Number(limit))
-      }
-    }
+        pages: Math.ceil(total / Number(limit)),
+      },
+    },
   });
 };
 
@@ -103,30 +105,30 @@ export const getJobById = async (req: Request, res: Response) => {
           size: true,
           industry: true,
           location: true,
-          verified: true
-        }
+          verified: true,
+        },
       },
       _count: {
         select: {
-          applications: true
-        }
-      }
-    }
+          applications: true,
+        },
+      },
+    },
   });
 
   if (!job) {
-    throw new ApiError('Job not found', 404);
+    throw new ApiError("Job not found", 404);
   }
 
   // Increment view count
   await prisma.job.update({
     where: { id },
-    data: { views: { increment: 1 } }
+    data: { views: { increment: 1 } },
   });
 
   res.json({
     success: true,
-    data: { job }
+    data: { job },
   });
 };
 
@@ -141,17 +143,17 @@ export const createJob = async (req: AuthRequest, res: Response) => {
     category,
     salary,
     featured = false,
-    expiresAt
+    expiresAt,
   } = req.body;
 
   // Get user's company
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
-    include: { company: true }
+    include: { company: true },
   });
 
   if (!user?.company) {
-    throw new ApiError('Company profile required to post jobs', 400);
+    throw new ApiError("Company profile required to post jobs", 400);
   }
 
   const job = await prisma.job.create({
@@ -166,7 +168,7 @@ export const createJob = async (req: AuthRequest, res: Response) => {
       salary,
       featured,
       expiresAt: expiresAt ? new Date(expiresAt) : undefined,
-      companyId: user.company.id
+      companyId: user.company.id,
     },
     include: {
       company: {
@@ -174,15 +176,15 @@ export const createJob = async (req: AuthRequest, res: Response) => {
           id: true,
           name: true,
           logo: true,
-          verified: true
-        }
-      }
-    }
+          verified: true,
+        },
+      },
+    },
   });
 
   res.status(201).json({
     success: true,
-    data: { job }
+    data: { job },
   });
 };
 
@@ -193,15 +195,15 @@ export const updateJob = async (req: AuthRequest, res: Response) => {
   // Check if job exists and user owns it
   const existingJob = await prisma.job.findUnique({
     where: { id },
-    include: { company: { include: { user: true } } }
+    include: { company: { include: { user: true } } },
   });
 
   if (!existingJob) {
-    throw new ApiError('Job not found', 404);
+    throw new ApiError("Job not found", 404);
   }
 
   if (existingJob.company.user.id !== req.user!.id) {
-    throw new ApiError('Not authorized to update this job', 403);
+    throw new ApiError("Not authorized to update this job", 403);
   }
 
   const job = await prisma.job.update({
@@ -213,15 +215,15 @@ export const updateJob = async (req: AuthRequest, res: Response) => {
           id: true,
           name: true,
           logo: true,
-          verified: true
-        }
-      }
-    }
+          verified: true,
+        },
+      },
+    },
   });
 
   res.json({
     success: true,
-    data: { job }
+    data: { job },
   });
 };
 
@@ -231,24 +233,24 @@ export const deleteJob = async (req: AuthRequest, res: Response) => {
   // Check if job exists and user owns it
   const existingJob = await prisma.job.findUnique({
     where: { id },
-    include: { company: { include: { user: true } } }
+    include: { company: { include: { user: true } } },
   });
 
   if (!existingJob) {
-    throw new ApiError('Job not found', 404);
+    throw new ApiError("Job not found", 404);
   }
 
   if (existingJob.company.user.id !== req.user!.id) {
-    throw new ApiError('Not authorized to delete this job', 403);
+    throw new ApiError("Not authorized to delete this job", 403);
   }
 
   await prisma.job.delete({
-    where: { id }
+    where: { id },
   });
 
   res.json({
     success: true,
-    message: 'Job deleted successfully'
+    message: "Job deleted successfully",
   });
 };
 
@@ -259,11 +261,11 @@ export const getCompanyJobs = async (req: AuthRequest, res: Response) => {
   // Get user's company
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
-    include: { company: true }
+    include: { company: true },
   });
 
   if (!user?.company) {
-    throw new ApiError('Company profile not found', 404);
+    throw new ApiError("Company profile not found", 404);
   }
 
   const [jobs, total] = await Promise.all([
@@ -272,17 +274,17 @@ export const getCompanyJobs = async (req: AuthRequest, res: Response) => {
       include: {
         _count: {
           select: {
-            applications: true
-          }
-        }
+            applications: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       skip,
-      take: Number(limit)
+      take: Number(limit),
     }),
     prisma.job.count({
-      where: { companyId: user.company.id }
-    })
+      where: { companyId: user.company.id },
+    }),
   ]);
 
   res.json({
@@ -293,8 +295,8 @@ export const getCompanyJobs = async (req: AuthRequest, res: Response) => {
         page: Number(page),
         limit: Number(limit),
         total,
-        pages: Math.ceil(total / Number(limit))
-      }
-    }
+        pages: Math.ceil(total / Number(limit)),
+      },
+    },
   });
 };
