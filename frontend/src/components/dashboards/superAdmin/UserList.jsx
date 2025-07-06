@@ -3,8 +3,18 @@ import { useState } from "react";
 
 const UsersManagement = () => {
   // Fetch users data
-  const [userLoading, setUserLoading] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [users, setUsers] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10; // Number of users displayed per page
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(users.length / usersPerPage);
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const endIndex = startIndex + usersPerPage;
+  const currentUsers = users.slice(startIndex, endIndex);
+
   // Mutation to toggle user activation status
 
   const handleUserStatusToggle = (userId, currentStatus) => {};
@@ -105,6 +115,34 @@ const UsersManagement = () => {
               ))}
             </div>
           )}
+
+          <div className="p-4 flex items-center justify-between border-t border-gray-200">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                currentPage === 1
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              }`}
+            >
+              Previous
+            </button>
+            <div className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </div>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                currentPage === totalPages
+                  ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
