@@ -14,7 +14,6 @@ const UsersManagement = () => {
   const startIndex = (currentPage - 1) * usersPerPage;
   const endIndex = startIndex + usersPerPage;
   const currentUsers = users.slice(startIndex, endIndex);
-
   // Mutation to toggle user activation status
 
   const handleUserStatusToggle = (userId, currentStatus) => {};

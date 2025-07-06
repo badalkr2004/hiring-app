@@ -1,19 +1,65 @@
 import React from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Users,
   Building,
   Briefcase,
   TrendingUp,
   Shield,
-  CheckCircle,
-  X,
   Eye,
 } from "lucide-react";
-import { api } from "../../libs/apis";
 import { Link } from "react-router-dom";
+import { api } from "../../libs/apis";
 
 const AdminDashboard = () => {
+  // Fetch dashboard stats
+  const [stats, setStats] = React.useState(null);
+  const [statsLoading, setStatsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true);
+        const response = await api.get("/dashboard/stats"); // Assuming stats endpoint
+        setStats(response.data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // Fetch users
+  const { data: users = [], isLoading: usersLoading } = useQuery({
+    queryKey: ["adminUsers"],
+    queryFn: async () => {
+      try {
+        const response = await api.get("/users/all");
+        return response.data.users; // Return the data here
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        return []; // Return empty array on error
+      }
+    },
+  });
+
+  // Fetch companies
+  const { data: companies = [], isLoading: companiesLoading } = useQuery({
+    queryKey: ["adminCompanies"],
+    queryFn: async () => {
+      try {
+        const response = await api.get("/companies");
+        return response.data.companies; // Return the data here
+      } catch (error) {
+        console.error("Error fetching companies:", error);
+        return []; // Return empty array on error
+      }
+    },
+  });
+
   const dashboardStats = [
     {
       label: "Total Users",
@@ -94,8 +140,7 @@ const AdminDashboard = () => {
               <h2 className="text-xl font-semibold text-gray-900">
                 User Management
               </h2>
-              s
-              <button className="text-sm font-medium  hover:underline bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 px-4 rounded">
+              <button className="text-sm font-medium hover:underline bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 px-4 rounded">
                 <Link to="/dashboard/users-management">Manage Users</Link>
               </button>
             </div>
@@ -116,63 +161,56 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                {users.map((user) => (
-                  <div key={user.id} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-medium">
-                            {user.firstName[0]}
-                            {user.lastName[0]}
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900">
-                            {user.firstName} {user.lastName}
-                          </h4>
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                user.role === "company"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-green-100 text-green-800"
-                              }`}
-                            >
-                              {user.role}
-                            </span>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                user.isActive
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {user.isActive ? "Active" : "Inactive"}
+                {users
+                  .slice(0, 2)
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .map((user) => (
+                    <div key={user.id} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                            <span className="text-white font-medium">
+                              {user.firstName[0]}
+                              {user.lastName[0]}
                             </span>
                           </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900">
+                              {user.firstName} {user.lastName}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {user.email}
+                            </p>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  user.role === "company"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-green-100 text-green-800"
+                                }`}
+                              >
+                                {user.role}
+                              </span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  user.isActive
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {user.isActive ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            <Eye className="h-4 w-4" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() =>
-                            handleUserStatusToggle(user.id, user.isActive)
-                          }
-                          className={`text-sm font-medium px-3 py-1 rounded-lg transition-colors duration-200 ${
-                            user.isActive
-                              ? "text-red-600 hover:text-red-700 hover:bg-red-50"
-                              : "text-green-600 hover:text-green-700 hover:bg-green-50"
-                          }`}
-                        >
-                          {user.isActive ? "Deactivate" : "Activate"}
-                        </button>
-                        <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                          <Eye className="h-4 w-4" />
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
@@ -201,55 +239,47 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                {companies.map((company) => (
-                  <div key={company.id} className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
-                          <Building className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900">
-                            {company.name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {company.industry} • {company.size}
-                          </p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                company.verified
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {company.verified ? "Verified" : "Pending"}
-                            </span>
-                            <span className="text-xs text-gray-500">
-                              {company.jobsPosted} jobs posted
-                            </span>
+                {companies
+                  .slice(0, 2)
+                  .sort((a, b) => b.createdAt - a.createdAt)
+                  .map((company) => (
+                    <div key={company.id} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+                            <Building className="h-6 w-6 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900">
+                              {company.name}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {company.industry} • {company.size}
+                            </p>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  company.verified
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-yellow-100 text-yellow-800"
+                                }`}
+                              >
+                                {company.verified ? "Verified" : "Pending"}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {company.jobsPosted} jobs posted
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {!company.verified && (
-                          <button
-                            onClick={() =>
-                              handleCompanyVerification(company.id)
-                            }
-                            className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center space-x-1"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                            <span>Verify</span>
+                        <div className="flex items-center space-x-2">
+                          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            <Eye className="h-4 w-4" />
                           </button>
-                        )}
-                        <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                          <Eye className="h-4 w-4" />
-                        </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
