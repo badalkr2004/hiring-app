@@ -28,7 +28,7 @@ const SimpleJobCard = ({ job }) => {
 
   return (
     <div
-      onClick={() => navigate(`/jobs/${job.id}/all-applicants`)}
+      onClick={() => navigate(`/dashboard/jobs/${job.id}`)}
       className="cursor-pointer bg-gradient-to-br from-white via-blue-50 to-indigo-50 rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-3 transition-transform hover:-translate-y-1 hover:shadow-lg duration-200"
     >
       <div className="flex items-center justify-between mb-1">
@@ -99,7 +99,7 @@ const SimpleJobCard = ({ job }) => {
             className="text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:underline transition-all duration-200 ml-4"
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/jobs/${job.id}/all-applicants`);
+              navigate(`/dashboard/jobs/${job.id}`);
             }}
           >
             View Applicants →

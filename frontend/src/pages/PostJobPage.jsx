@@ -264,21 +264,28 @@ const PostJobPage = () => {
                     <textarea
                       required
                       rows={6}
+                      minLength={50}
+                      maxLength={2000}
                       value={formData.description}
                       onChange={(e) =>
                         handleInputChange("description", e.target.value)
                       }
                       className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg bg-white shadow-sm hover:shadow-md resize-none"
-                      placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
+                      placeholder="Describe the role, responsibilities, and what makes this opportunity exciting... (Minimum 50 characters)"
                     />
+                    {formData.description && formData.description.length < 50 && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Description must be at least 50 characters long
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-6">
+                <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={nextStep}
-                    disabled={!formData.title || !formData.description}
+                    disabled={!formData.title || !formData.description || formData.description.length < 50}
                     className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
                     Next Step

@@ -245,7 +245,7 @@ const CompanyDashboard = () => {
                 Recent Job Posts
               </h2>
               <Link
-                to="/dashboard/all-jobs"
+                to="/dashboard/jobs"
                 className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 font-medium text-sm shadow-sm"
               >
                 View All Jobs

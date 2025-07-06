@@ -20,6 +20,7 @@ import SettingsPage from "./pages/SettingPage";
 import JobApplyPage from "./pages/JobApplyPage";
 import UsersManagement from "./components/dashboards/superAdmin/UserList";
 import ViewAllPostedJobs from "./pages/ViewAllPostedJobs";
+import ViewAllApplicants from "./pages/ViewAllApplicants";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,10 +66,19 @@ function App() {
               />
 
               <Route
-                path="/dashboard/all-jobs"
+                path="/dashboard/jobs"
                 element={
                   <ProtectedRoute allowedRoles={["COMPANY", "ADMIN"]}>
                     <ViewAllPostedJobs />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/dashboard/jobs/:id"
+                element={
+                  <ProtectedRoute allowedRoles={["COMPANY", "ADMIN"]}>
+                    <ViewAllApplicants />
                   </ProtectedRoute>
                 }
               />

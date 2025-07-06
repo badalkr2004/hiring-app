@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useApiQuery, useApiMutation, AddResume } from "../libs/useApi";
@@ -21,11 +21,19 @@ const JobApplyPage = () => {
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [alreadyApplied, setAlreadyApplied] = useState(false);
 
   // Fetch job details
-  const { data: jobData, isLoading: jobLoading } = useApiQuery(`/jobs/${jobId}`);
-  const job = jobData?.data?.job;
+  const { data: jobData, isLoading: jobLoading } = useApiQuery(
+    `/jobs/${jobId}`
+  );
+  const { data: isAppliedData, isLoading: isAppliedLoading } = useApiQuery(
+    `/applications/applied/status?jobId=${jobId}`
+  );
+  const job = useMemo(() => jobData?.data?.job, [jobData]);
+  const isApplied = useMemo(
+    () => isAppliedData?.data?.applied,
+    [isAppliedData]
+  );
 
   useEffect(() => {
     setResumeUrl(userData?.resume);
@@ -35,17 +43,27 @@ const JobApplyPage = () => {
   const { handleResumeUpload, isResumeUploadPending } = AddResume();
 
   // Application mutation
-  const applyMutation = useApiMutation("post", `/applications/jobs/${jobId}/apply`, {
-    mutationOptions: {
-      onSuccess: () => {
-        setMessage({ type: "success", text: "Application submitted successfully!" });
-        setTimeout(() => navigate(`/jobs/${jobId}`), 2000);
+  const applyMutation = useApiMutation(
+    "post",
+    `/applications/jobs/${jobId}/apply`,
+    {
+      mutationOptions: {
+        onSuccess: () => {
+          setMessage({
+            type: "success",
+            text: "Application submitted successfully!",
+          });
+          setTimeout(() => navigate(`/jobs/${jobId}`), 2000);
+        },
+        onError: (err) => {
+          setMessage({
+            type: "error",
+            text: err?.message || "Failed to apply.",
+          });
+        },
       },
-      onError: (err) => {
-        setMessage({ type: "error", text: err?.message || "Failed to apply." });
-      },
-    },
-  });
+    }
+  );
 
   // Check if already applied (mock, replace with real check if needed)
   // You could fetch user applications and check for jobId match
@@ -86,7 +104,9 @@ const JobApplyPage = () => {
         <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center">
           <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">Please log in to apply</h2>
-          <p className="text-gray-600 mb-6">You need to be signed in to apply for jobs.</p>
+          <p className="text-gray-600 mb-6">
+            You need to be signed in to apply for jobs.
+          </p>
           <Link
             to="/login"
             className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 font-medium"
@@ -98,33 +118,36 @@ const JobApplyPage = () => {
     );
   }
 
-  // Loading job
-  if (jobLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3 mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-
   // Already applied (mock, replace with real check)
-  if (alreadyApplied) {
+  if (isApplied) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="min-h-[calc(100vh-100px)] flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center">
           <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">You've already applied!</h2>
-          <p className="text-gray-600 mb-6">Thank you for your interest. We'll be in touch if you're shortlisted.</p>
+          <p className="text-gray-600 mb-6">
+            Thank you for your interest. We'll be in touch if you're
+            shortlisted.
+          </p>
           <Link
             to={`/jobs/${jobId}`}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 font-medium"
           >
             Back to Job
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading job
+  if (jobLoading || isAppliedLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3 mx-auto"></div>
         </div>
       </div>
     );
@@ -198,7 +221,10 @@ const JobApplyPage = () => {
 
           {/* Cover Letter */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="coverLetter">
+            <label
+              className="block text-gray-700 font-medium mb-2"
+              htmlFor="coverLetter"
+            >
               Cover Letter <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -213,7 +239,10 @@ const JobApplyPage = () => {
 
           {/* Resume Upload */}
           <div>
-            <label className="block text-gray-700 font-medium mb-2" htmlFor="resume">
+            <label
+              className="block text-gray-700 font-medium mb-2"
+              htmlFor="resume"
+            >
               Resume (optional)
             </label>
             <div className="flex items-center justify-between gap-3">
@@ -225,15 +254,17 @@ const JobApplyPage = () => {
                 onChange={handleResumeChange}
                 disabled={isResumeUploadPending}
               />
-              {isResumeUploadPending && <span className="text-blue-500 text-xs">Uploading...</span>}
+              {isResumeUploadPending && (
+                <span className="text-blue-500 text-xs">Uploading...</span>
+              )}
               {resumeUrl && (
-                <a 
-                  href={resumeUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-blue-600 hover:underline flex items-center gap-1"
                 >
-                  <FileText className="h-4 w-4" /> 
+                  <FileText className="h-4 w-4" />
                   <div className="w-[180px]">View Uploaded Resume</div>
                 </a>
               )}
