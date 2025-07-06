@@ -47,10 +47,11 @@ const SearchBar = ({ filters, onFiltersChange }) => {
           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         >
           <option value="">All Types</option>
-          <option value="full-time">Full Time</option>
-          <option value="part-time">Part Time</option>
-          <option value="contract">Contract</option>
-          <option value="remote">Remote</option>
+          <option value="FULL_TIME">Full Time</option>
+          <option value="PART_TIME">Part Time</option>
+          <option value="CONTRACT">Contract</option>
+          <option value="REMOTE">Remote</option>
+          <option value="INTERNSHIP">Internship</option>
         </select>
 
         <select
