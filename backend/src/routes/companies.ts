@@ -45,9 +45,7 @@ router.put(
       body("foundedYear")
         .optional()
         .isInt({ min: 1800, max: new Date().getFullYear() }),
-      body("website")
-        .optional()
-        .isInt({ min: 1800, max: new Date().getFullYear() }),
+      body("website").optional().isURL(),
     ]),
   ],
   updateCompany
