@@ -17,6 +17,8 @@ import DashboardPage from "./pages/DashboardPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import SettingsPage from "./pages/SettingPage";
+import JobApplyPage from "./pages/JobApplyPage";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +42,16 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+              {/* job apply page */}
+              <Route
+                path="/jobs/:id/apply"
+                element={
+                  <ProtectedRoute allowedRoles={["USER"]}>
+                    <JobApplyPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Protected Routes */}
               <Route

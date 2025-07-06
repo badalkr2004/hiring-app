@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MapPin, Clock, DollarSign, Star, Building } from "lucide-react";
 
 const JobCard = ({ job }) => {
+  const navigate = useNavigate();
   const getTypeColor = (type) => {
     switch (type) {
       case "full-time":
@@ -86,10 +87,12 @@ const JobCard = ({ job }) => {
               {job.type.replace("_", " ").toUpperCase()}
             </span>
             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-              {job.category}
+              {job.category.length > 15
+                ? job.category.slice(0, 15) + "..."
+                : job.category}
             </span>
           </div>
-          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:underline transition-all duration-200">
+          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:underline transition-all duration-200" onClick={() => navigate(`/jobs/${job.id}/apply`)}>
             View Details →
           </button>
         </div>

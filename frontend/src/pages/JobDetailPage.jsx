@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   MapPin,
   Clock,
@@ -23,7 +23,7 @@ const JobDetailPage = () => {
   const { id } = useParams();
   const { data, isLoading, error } = useApiQuery(`/jobs/${id}`);
   const [job, setJob] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (data?.success) {
       setJob(data.data.job);
@@ -122,7 +122,7 @@ const JobDetailPage = () => {
               <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-8 py-8 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
-                
+
                 <div className="relative z-10">
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-start space-x-4">
@@ -131,7 +131,9 @@ const JobDetailPage = () => {
                       </div>
                       <div>
                         <h1 className="text-3xl font-bold mb-2">{job.title}</h1>
-                        <p className="text-blue-100 text-lg font-medium">{job.company.name}</p>
+                        <p className="text-blue-100 text-lg font-medium">
+                          {job.company.name}
+                        </p>
                         <div className="flex items-center space-x-4 mt-3 text-blue-100">
                           <div className="flex items-center space-x-2">
                             <MapPin className="h-4 w-4" />
@@ -168,7 +170,9 @@ const JobDetailPage = () => {
                         <Clock className="h-4 w-4" />
                         <span className="text-sm font-medium">Type</span>
                       </div>
-                      <p className="text-lg font-bold">{job.type.replace("_", " ")}</p>
+                      <p className="text-lg font-bold">
+                        {job.type.replace("_", " ")}
+                      </p>
                     </div>
                     <div className="bg-white/20 rounded-xl p-4 backdrop-blur-sm">
                       <div className="flex items-center space-x-2 mb-1">
@@ -192,7 +196,11 @@ const JobDetailPage = () => {
             {/* Job Description Card */}
             <div className="bg-white rounded-2xl shadow-xl p-8">
               <div className="flex items-center space-x-4 mb-6">
-                <div className={`px-4 py-2 rounded-full text-sm font-medium ${getJobTypeColor(job.type)}`}>
+                <div
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${getJobTypeColor(
+                    job.type
+                  )}`}
+                >
                   {job.type.replace("_", " ")}
                 </div>
                 <div className="px-4 py-2 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
@@ -250,7 +258,10 @@ const JobDetailPage = () => {
                 Apply for this job
               </h3>
               <div className="space-y-3">
-                <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <button
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  onClick={() => navigate(`/jobs/${id}/apply`)}
+                >
                   Apply Now
                 </button>
                 <button className="w-full border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium">
@@ -272,7 +283,9 @@ const JobDetailPage = () => {
                   {job.company.verified && (
                     <div className="flex items-center space-x-1">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-sm text-green-600 font-medium">Verified</span>
+                      <span className="text-sm text-green-600 font-medium">
+                        Verified
+                      </span>
                     </div>
                   )}
                 </div>
@@ -284,21 +297,27 @@ const JobDetailPage = () => {
                     <Globe className="h-4 w-4" />
                     <span>Industry</span>
                   </label>
-                  <p className="text-gray-900 font-medium">{job.company.industry}</p>
+                  <p className="text-gray-900 font-medium">
+                    {job.company.industry}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center space-x-2">
                     <Users className="h-4 w-4" />
                     <span>Company Size</span>
                   </label>
-                  <p className="text-gray-900 font-medium">{job.company.size} employees</p>
+                  <p className="text-gray-900 font-medium">
+                    {job.company.size} employees
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600 flex items-center space-x-2">
                     <MapPin className="h-4 w-4" />
                     <span>Location</span>
                   </label>
-                  <p className="text-gray-900 font-medium">{job.company.location}</p>
+                  <p className="text-gray-900 font-medium">
+                    {job.company.location}
+                  </p>
                 </div>
                 {job.company.website && (
                   <div>
@@ -306,9 +325,9 @@ const JobDetailPage = () => {
                       <Globe className="h-4 w-4" />
                       <span>Website</span>
                     </label>
-                    <a 
-                      href={job.company.website} 
-                      target="_blank" 
+                    <a
+                      href={job.company.website}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
                     >
@@ -338,23 +357,33 @@ const JobDetailPage = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Applications</span>
-                  <span className="font-semibold text-gray-900">{job._count.applications}</span>
+                  <span className="font-semibold text-gray-900">
+                    {job._count.applications}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Views</span>
-                  <span className="font-semibold text-gray-900">{job.views}</span>
+                  <span className="font-semibold text-gray-900">
+                    {job.views}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Status</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    job.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      job.status === "ACTIVE"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
                     {job.status}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Expires</span>
-                  <span className="font-semibold text-gray-900">{formatDate(job.expiresAt)}</span>
+                  <span className="font-semibold text-gray-900">
+                    {formatDate(job.expiresAt)}
+                  </span>
                 </div>
               </div>
             </div>
