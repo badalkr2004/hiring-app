@@ -100,3 +100,67 @@ export const uploadResume = async (req: AuthRequest, res: Response) => {
     message: "Resume uploaded successfully",
   });
 };
+
+// get all users for admin dashboard
+export const getAllUsers = async (req: AuthRequest, res: Response) => {
+  const { page = 1, limit = 10, search } = req.query;
+
+  const skip = (Number(page) - 1) * Number(limit);
+  const take = Number(limit);
+
+  const where: any = {
+    role: {
+      not: "ADMIN", // Exclude admin users
+    },
+  };
+
+  if (search) {
+    where.OR = [
+      { firstName: { contains: search as string, mode: "insensitive" } },
+      { lastName: { contains: search as string, mode: "insensitive" } },
+      { email: { contains: search as string, mode: "insensitive" } },
+    ];
+  }
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        avatar: true,
+        phone: true,
+        location: true,
+        skills: true,
+        bio: true,
+        education: true,
+        linkedIn: true,
+        github: true,
+        portfolio: true,
+        experience: true,
+        isActive: true,
+        isVerified: true,
+        createdAt: true,
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  res.json({
+    success: true,
+    data: {
+      users,
+      totalCount: total,
+      pageInfo: {
+        currentPage: Number(page),
+        totalPages: Math.ceil(total / take),
+      },
+    },
+  });
+};

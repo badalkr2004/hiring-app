@@ -10,50 +10,10 @@ import {
   X,
   Eye,
 } from "lucide-react";
-import { authService } from "../../services/authService";
-import { applicationService } from "../../services/applicationService";
+import { api } from "../../libs/apis";
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
-  const queryClient = useQueryClient();
-
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["admin-stats"],
-    queryFn: () => applicationService.getDashboardStats(),
-  });
-
-  const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ["admin-users"],
-    queryFn: () => authService.getAllUsers(),
-  });
-
-  const { data: companies = [], isLoading: companiesLoading } = useQuery({
-    queryKey: ["admin-companies"],
-    queryFn: () => authService.getAllCompanies(),
-  });
-
-  const updateUserStatusMutation = useMutation({
-    mutationFn: ({ userId, isActive }) =>
-      authService.updateUserStatus(userId, isActive),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-    },
-  });
-
-  const verifyCompanyMutation = useMutation({
-    mutationFn: (companyId) => authService.verifyCompany(companyId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-companies"] });
-    },
-  });
-
-  const handleUserStatusToggle = (userId, currentStatus) => {
-    updateUserStatusMutation.mutate({ userId, isActive: !currentStatus });
-  };
-
-  const handleCompanyVerification = (companyId) => {
-    verifyCompanyMutation.mutate(companyId);
-  };
-
   const dashboardStats = [
     {
       label: "Total Users",
@@ -130,10 +90,14 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Users Management */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
                 User Management
               </h2>
+              s
+              <button className="text-sm font-medium  hover:underline bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 px-4 rounded">
+                <Link to="/dashboard/users-management">Manage Users</Link>
+              </button>
             </div>
 
             {usersLoading ? (
