@@ -15,6 +15,8 @@ const HomePage = () => {
   });
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(2);
 
   // Fetch jobs from API when filters change
   useEffect(() => {
@@ -28,18 +30,24 @@ const HomePage = () => {
         if (filters.type && filters.type !== "all") params.type = filters.type;
         if (filters.category && filters.category !== "all")
           params.category = filters.category;
-        // Add pagination, sorting if needed
+        if (filters.salaryRange && filters.salaryRange !== "all")
+          params.salaryRange = filters.salaryRange;
+        // pagination
+        const limit = 10; // jobs per page
+        params.page = page;
+        params.limit = limit;
 
         const res = await api.get("/jobs", { params });
         console.log(res.data.jobs);
         setJobs(res.data?.jobs || []);
+        setTotalPages(res.data?.pagination.pages || 1);
       } catch (err) {
         setJobs([]);
       }
       setIsLoading(false);
     };
     fetchJobs();
-  }, [filters]);
+  }, [filters, page]);
 
   const stats = [
     {
@@ -114,6 +122,26 @@ const HomePage = () => {
       {/* Job Listings */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <JobList jobs={jobs} isLoading={isLoading} />
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-8 gap-2">
+          <button
+            className="px-4 py-2 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2">
+            {page} / {totalPages}
+          </span>
+          <button
+            className="px-4 py-2 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
