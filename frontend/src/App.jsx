@@ -19,6 +19,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import SettingsPage from "./pages/SettingPage";
 import JobApplyPage from "./pages/JobApplyPage";
 import UsersManagement from "./components/dashboards/superAdmin/UserList";
+import ViewAllPostedJobs from "./pages/ViewAllPostedJobs";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,6 +60,15 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/dashboard/all-jobs"
+                element={
+                  <ProtectedRoute allowedRoles={["COMPANY", "ADMIN"]}>
+                    <ViewAllPostedJobs />
                   </ProtectedRoute>
                 }
               />
