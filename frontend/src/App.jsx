@@ -18,7 +18,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import SettingsPage from "./pages/SettingPage";
 import JobApplyPage from "./pages/JobApplyPage";
-
+import UsersManagement from "./components/dashboards/superAdmin/UserList";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +62,17 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+
+              {/* Admin Routes */}
+              <Route
+                path="/dashboard/users-management"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                    <UsersManagement />
+                  </ProtectedRoute>
+                }
+              />
+
               <Route
                 path="/post-job"
                 element={

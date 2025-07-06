@@ -3,10 +3,12 @@ import { body } from "express-validator";
 import { validate } from "@/middleware/validation";
 import { authenticate } from "@/middleware/auth";
 import {
+  getAllUsers,
   updateProfile,
   uploadAvatar,
   uploadResume,
 } from "@/controllers/userController";
+import { get } from "http";
 
 const router = Router();
 
@@ -32,6 +34,20 @@ router.put(
     ]),
   ],
   updateProfile
+);
+
+// get all users for the admin dashboard
+router.get(
+  "/all",
+  [
+    authenticate,
+    validate([
+      body("page").optional().isInt({ min: 1 }),
+      body("limit").optional().isInt({ min: 1, max: 50 }),
+      body("search").optional().trim(),
+    ]),
+  ],
+  getAllUsers
 );
 
 // Upload avatar
