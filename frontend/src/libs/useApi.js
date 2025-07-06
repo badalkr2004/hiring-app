@@ -2,8 +2,9 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "./apis";
 import { CLOUD_NAME } from "../config/api";
 
-export function useApiQuery(key, endpoint, options = {}) {
+export function useApiQuery(endpoint, options = {}) {
   const { params, token, queryOptions = {}, queryFnOverride } = options;
+  const key = endpoint;
 
   return useQuery({
     queryKey: Array.isArray(key) ? key : [key, params],
