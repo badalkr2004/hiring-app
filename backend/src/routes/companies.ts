@@ -53,7 +53,7 @@ router.put(
   "/profile",
   [
     authenticate,
-    authorize(UserRole.COMPANY, UserRole.ADMIN),
+    authorize(UserRole.COMPANY),
     validate([
       body("name").optional().trim().isLength({ min: 1 }),
       body("description").optional().trim(),
