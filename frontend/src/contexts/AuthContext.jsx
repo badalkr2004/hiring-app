@@ -20,12 +20,22 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(true);
     localStorage.setItem("accessToken", access);
   }, []);
+  
+  // Update userData and store in localStorage
+  const updateUserData = useCallback((user) => {
+    setUserData(user);
+    if (user) {
+      localStorage.setItem("userData", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("userData");
+    }
+  }, []);
 
   const clearTokens = useCallback(() => {
     setIsLoggedIn(false);
-    setUserData(null);
+    updateUserData(null);
     localStorage.removeItem("accessToken");
-  }, []);
+  }, [updateUserData]);
 
   const validateToken = useCallback(async (token) => {
     if (!token) {
@@ -43,7 +53,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Token validation failed");
       }
 
-      setUserData(response.data.user);
+      updateUserData(response.data.user);
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Token validation error:", error);
@@ -51,14 +61,26 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [clearTokens]);
+  }, [clearTokens, updateUserData]);
 
   useEffect(() => {
     const storedAccess = localStorage.getItem("accessToken");
+    const storedUserData = localStorage.getItem("userData");
+    
+    if (storedUserData) {
+      try {
+        const parsedUserData = JSON.parse(storedUserData);
+        setUserData(parsedUserData);
+      } catch (error) {
+        console.error("Error parsing userData from localStorage:", error);
+        localStorage.removeItem("userData");
+      }
+    }
+    
     if (storedAccess) {
       setAccessToken(storedAccess);
       validateToken(storedAccess);
-    }else {
+    } else {
       setIsLoggedIn(false);
       setUserData(null);
       setIsLoading(false);
@@ -74,7 +96,7 @@ export const AuthProvider = ({ children }) => {
         clearTokens,
         isLoading,
         userData,
-        setUserData,
+        setUserData: updateUserData,
       }}
     >
       {children}

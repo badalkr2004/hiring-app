@@ -25,6 +25,7 @@ import AdminUserProfile from "./components/dashboards/superAdmin/AdminUserProfil
 import AdminCompanyList from "./components/dashboards/superAdmin/CompanyList";
 import AdminCompanyView from "./components/dashboards/superAdmin/AdminCompanyProfile";
 import AdminCompanyEdit from "./components/dashboards/superAdmin/AdminCompanyEdit";
+import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -148,13 +149,31 @@ function App() {
                 }
               />
 
+              {/* Chat Routes */}
+              <Route
+                path="/chat"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "COMPANY", "ADMIN"]}>
+                    <Chat />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/chat/:chatId"
+                element={
+                  <ProtectedRoute allowedRoles={["USER", "COMPANY", "ADMIN"]}>
+                    <Chat />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Redirect unknown routes */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </Router>
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }
