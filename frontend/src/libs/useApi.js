@@ -57,7 +57,7 @@ export function AddPhoto(cloudName = CLOUD_NAME) {
 }
 
 export function AddResume(cloudName = CLOUD_NAME) {
-  const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/raw/upload`;
   const mutation = useMutation({
     mutationFn: (data) => {
       return fetch(url, {

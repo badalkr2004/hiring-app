@@ -15,7 +15,7 @@ import {
   Globe,
 } from "lucide-react";
 import { api } from "../libs/apis";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 const statusColors = {
   REVIEW: "bg-purple-100 text-purple-700",
@@ -25,14 +25,14 @@ const statusColors = {
   PENDING: "bg-yellow-100 text-yellow-700",
 };
 
-const TABS = ["Resume", "Report", "Cover Letter"];
+const TABS = ["Resume", "Cover Letter"];
 const STATUS_OPTIONS = [
-  "All",
-  "pending",
-  "screening",
-  "shortlisted",
+  "ALL",
+  "PENDING",
+  "REVIEWED",
+  "SHORTLISTED",
   "REJECTED",
-  "hired",
+  "HIRED",
 ];
 
 const getInitials = (user) => {
@@ -58,10 +58,12 @@ const formatDateAgo = (dateString) => {
 
 const ViewAllApplicants = ({ jobId }) => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const applicantId = searchParams.get("applicantId");
   const [applications, setApplications] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [selected, setSelected] = useState(null);
   const [tab, setTab] = useState("Resume");
   const [loading, setLoading] = useState(true);
@@ -72,20 +74,21 @@ const ViewAllApplicants = ({ jobId }) => {
     (async () => {
       setLoading(true);
       let data = await api.get(`/applications/job/${id}`);
-      console.log("data", data);
-
       setApplications(data.data.applications || []);
       setFiltered(data.data.applications || []);
-      setSelected(data.data.applications[0] || null);
+      setSelected(
+        data.data.applications.find((a) => a.user.id === applicantId) ||
+          data.data.applications[0]
+      );
       setAppStatus(data.data.applications[0]?.status || "");
       setLoading(false);
     })();
-  }, [jobId]);
+  }, [id, applicantId]);
 
   // Filter by search and status
   useEffect(() => {
     let result = applications;
-    if (statusFilter !== "All") {
+    if (statusFilter !== "ALL") {
       result = result.filter((a) => a.status === statusFilter);
     }
     if (search) {
@@ -171,7 +174,6 @@ const ViewAllApplicants = ({ jobId }) => {
     );
 
     if (!selected) return;
-    console.log(selected.id);
     try {
       const status = await api.patch(`/applications/${selected.id}/status`, {
         status: newStatus,
@@ -411,20 +413,18 @@ const ViewAllApplicants = ({ jobId }) => {
                 {tab === "Resume" &&
                   (selected.resume ? (
                     <iframe
-                      src={selected.resume}
-                      title="Resume PDF"
-                      className="w-full h-[70vh] rounded-xl border border-gray-200 bg-white"
-                    />
+                      src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                        selected.resume
+                      )}&embedded=true`}
+                      width="100%"
+                      height="600px"
+                      style={{ border: "none" }}
+                    ></iframe>
                   ) : (
                     <div className="text-gray-400 text-center py-16">
                       No resume uploaded.
                     </div>
                   ))}
-                {tab === "Report" && (
-                  <div className="text-gray-400 text-center py-16">
-                    Report feature coming soon.
-                  </div>
-                )}
                 {tab === "Cover Letter" && (
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-700 text-base min-h-[60px]">
                     {selected.coverLetter || (
