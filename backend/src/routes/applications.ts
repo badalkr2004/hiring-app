@@ -12,6 +12,7 @@ import {
   withdrawApplication,
   userApplicationStatus,
   getApplicationByJobId,
+  getRecentApplicationByCompanyId,
 } from "@/controllers/applicationController";
 
 const router = Router();
@@ -132,6 +133,18 @@ router.get(
     validate([param("jobId").isMongoId().withMessage("Invalid job ID")]),
   ],
   getApplicationByJobId
+);
+
+// get recent application by specific comapny id
+router.get(
+  "/recent/:companyId",
+  [
+    authenticate,
+    validate([
+      param("companyId").isMongoId().withMessage("Invalid company ID"),
+    ]),
+  ],
+  getRecentApplicationByCompanyId
 );
 
 // Withdraw application

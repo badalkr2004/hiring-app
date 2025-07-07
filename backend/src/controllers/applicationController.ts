@@ -457,3 +457,52 @@ export const getApplicationByJobId = async (
     data: { applications },
   });
 };
+
+export const getRecentApplicationByCompanyId = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  const { companyId } = req.params;
+
+  if (!companyId) {
+    throw new ApiError("Company ID is required", 400);
+  }
+  // limit for for 5 applications and date should be in descending order
+  // Get applications for the company
+  const applications = await prisma.application.findMany({
+    where: { job: { companyId: companyId as string } },
+    orderBy: { createdAt: "desc" }, // or use 'id' if createdAt is not available
+    take: 5,
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          avatar: true,
+          resume: true,
+          phone: true,
+          location: true,
+          skills: true,
+          experience: true,
+          github: true,
+          linkedIn: true,
+        },
+      },
+      job: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          location: true,
+        },
+      },
+    },
+  });
+
+  res.json({
+    success: true,
+    data: { applications },
+  });
+};
