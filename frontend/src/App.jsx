@@ -21,6 +21,10 @@ import JobApplyPage from "./pages/JobApplyPage";
 import UsersManagement from "./components/dashboards/superAdmin/UserList";
 import ViewAllPostedJobs from "./pages/ViewAllPostedJobs";
 import ViewAllApplicants from "./pages/ViewAllApplicants";
+import AdminUserProfile from "./components/dashboards/superAdmin/AdminUserProfile";
+import AdminCompanyList from "./components/dashboards/superAdmin/CompanyList";
+import AdminCompanyView from "./components/dashboards/superAdmin/AdminCompanyProfile";
+import AdminCompanyEdit from "./components/dashboards/superAdmin/AdminCompanyEdit";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -89,6 +93,39 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={["ADMIN"]}>
                     <UsersManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/users-management/:userId"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                    <AdminUserProfile />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/dashboard/company-management"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                    <AdminCompanyList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/company-management/:companyId/view"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                    <AdminCompanyView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/company-management/:companyId/edit"
+                element={
+                  <ProtectedRoute allowedRoles={["ADMIN"]}>
+                    <AdminCompanyEdit />
                   </ProtectedRoute>
                 }
               />

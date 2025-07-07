@@ -42,6 +42,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+app.options("*", cors());
 app.use("/api/", limiter);
 
 // CORS configuration

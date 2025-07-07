@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
-import prisma from '@/config/database';
-import { ApiError } from '@/utils/ApiError';
-import { AuthRequest } from '@/middleware/auth';
+import { Request, Response } from "express";
+import prisma from "@/config/database";
+import { ApiError } from "@/utils/ApiError";
+import { AuthRequest } from "@/middleware/auth";
 
 export const getCompanies = async (req: Request, res: Response) => {
   const { page = 1, limit = 10, search, industry, verified } = req.query;
@@ -11,17 +11,17 @@ export const getCompanies = async (req: Request, res: Response) => {
 
   if (search) {
     where.OR = [
-      { name: { contains: search as string, mode: 'insensitive' } },
-      { description: { contains: search as string, mode: 'insensitive' } }
+      { name: { contains: search as string, mode: "insensitive" } },
+      { description: { contains: search as string, mode: "insensitive" } },
     ];
   }
 
   if (industry) {
-    where.industry = { contains: industry as string, mode: 'insensitive' };
+    where.industry = { contains: industry as string, mode: "insensitive" };
   }
 
   if (verified !== undefined) {
-    where.verified = verified === 'true';
+    where.verified = verified === "true";
   }
 
   const [companies, total] = await Promise.all([
@@ -42,16 +42,16 @@ export const getCompanies = async (req: Request, res: Response) => {
         _count: {
           select: {
             jobs: {
-              where: { status: 'ACTIVE' }
-            }
-          }
-        }
+              where: { status: "ACTIVE" },
+            },
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       skip,
-      take: Number(limit)
+      take: Number(limit),
     }),
-    prisma.company.count({ where })
+    prisma.company.count({ where }),
   ]);
 
   res.json({
@@ -62,9 +62,9 @@ export const getCompanies = async (req: Request, res: Response) => {
         page: Number(page),
         limit: Number(limit),
         total,
-        pages: Math.ceil(total / Number(limit))
-      }
-    }
+        pages: Math.ceil(total / Number(limit)),
+      },
+    },
   });
 };
 
@@ -75,7 +75,7 @@ export const getCompanyById = async (req: Request, res: Response) => {
     where: { id },
     include: {
       jobs: {
-        where: { status: 'ACTIVE' },
+        where: { status: "ACTIVE" },
         select: {
           id: true,
           title: true,
@@ -85,30 +85,30 @@ export const getCompanyById = async (req: Request, res: Response) => {
           createdAt: true,
           _count: {
             select: {
-              applications: true
-            }
-          }
+              applications: true,
+            },
+          },
         },
-        orderBy: { createdAt: 'desc' },
-        take: 10
+        orderBy: { createdAt: "desc" },
+        take: 10,
       },
       _count: {
         select: {
           jobs: {
-            where: { status: 'ACTIVE' }
-          }
-        }
-      }
-    }
+            where: { status: "ACTIVE" },
+          },
+        },
+      },
+    },
   });
 
   if (!company) {
-    throw new ApiError('Company not found', 404);
+    throw new ApiError("Company not found", 404);
   }
 
   res.json({
     success: true,
-    data: { company }
+    data: { company },
   });
 };
 
@@ -118,20 +118,36 @@ export const updateCompany = async (req: AuthRequest, res: Response) => {
   // Get user's company
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
-    include: { company: true }
+    include: { company: true },
   });
 
   if (!user?.company) {
-    throw new ApiError('Company profile not found', 404);
+    throw new ApiError("Company profile not found", 404);
   }
 
   const company = await prisma.company.update({
     where: { id: user.company.id },
-    data: updateData
+    data: updateData,
   });
 
   res.json({
     success: true,
-    data: { company }
+    data: { company },
+  });
+};
+
+export const updateCompanybyAdmin = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  console.log(id);
+  const updateData = req.body;
+
+  const company = await prisma.company.update({
+    where: { id },
+    data: { ...updateData, foundedYear: parseInt(updateData.foundedYear) },
+  });
+
+  res.json({
+    success: true,
+    data: { company },
   });
 };

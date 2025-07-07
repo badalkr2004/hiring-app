@@ -11,6 +11,7 @@ import {
   getApplicationById,
   withdrawApplication,
   userApplicationStatus,
+  getApplicationByJobId,
 } from "@/controllers/applicationController";
 
 const router = Router();
@@ -121,6 +122,16 @@ router.get(
     validate([param("id").isMongoId().withMessage("Invalid application ID")]),
   ],
   getApplicationById
+);
+
+//get application by specific job id
+router.get(
+  "/job/:jobId",
+  [
+    authenticate,
+    validate([param("jobId").isMongoId().withMessage("Invalid job ID")]),
+  ],
+  getApplicationByJobId
 );
 
 // Withdraw application
