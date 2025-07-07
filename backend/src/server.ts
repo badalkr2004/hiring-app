@@ -19,6 +19,8 @@ import companyRoutes from "@/routes/companies";
 import jobRoutes from "@/routes/jobs";
 import applicationRoutes from "@/routes/applications";
 import adminRoutes from "@/routes/admin";
+import chatRoutes from "@/routes/chat";
+import communityRoutes from "@/routes/community";
 
 // Load environment variables
 dotenv.config();
@@ -33,17 +35,17 @@ connectDB();
 app.use(helmet());
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000"), // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || "100"), // limit each IP to 100 requests per windowMs
-  message: {
-    error: "Too many requests from this IP, please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// const limiter = rateLimit({
+//   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000"), // 15 minutes
+//   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || "100"), // limit each IP to 100 requests per windowMs
+//   message: {
+//     error: "Too many requests from this IP, please try again later.",
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
 app.options("*", cors());
-app.use("/api/", limiter);
+// app.use("/api/", limiter);
 
 // CORS configuration
 app.use(
@@ -92,6 +94,8 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/chats", chatRoutes);
+app.use("/api/communities", communityRoutes);
 
 // 404 handler
 app.use(notFound);
