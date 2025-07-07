@@ -409,3 +409,51 @@ export const userApplicationStatus = async (
     });
   }
 };
+
+export const getApplicationByJobId = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  const { jobId } = req.params;
+
+  if (!jobId) {
+    throw new ApiError("Job ID is required", 400);
+  }
+
+  // Get applications for the job
+  const applications = await prisma.application.findMany({
+    where: { jobId: jobId as string },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          avatar: true,
+          resume: true,
+          phone: true,
+          location: true,
+          skills: true,
+          experience: true,
+          github: true,
+          linkedIn: true,
+        },
+      },
+      job: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          location: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  res.json({
+    success: true,
+    data: { applications },
+  });
+};

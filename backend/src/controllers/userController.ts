@@ -66,6 +66,108 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     data: { user },
   });
 };
+export const updateProfilebyAdmin = async (req: AuthRequest, res: Response) => {
+  const {
+    firstName,
+    lastName,
+    phone,
+    location,
+    skills,
+    experience,
+    bio,
+    education,
+    linkedIn,
+    github,
+    portfolio,
+    avatar,
+    resume,
+  } = req.body;
+
+  const user = await prisma.user.update({
+    where: { id: req.params!.id },
+    data: {
+      firstName,
+      lastName,
+      phone,
+      location,
+      skills,
+      experience,
+      bio,
+      education,
+      linkedIn,
+      github,
+      portfolio,
+      avatar,
+      resume,
+    },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      avatar: true,
+      phone: true,
+      location: true,
+      skills: true,
+      bio: true,
+      education: true,
+      linkedIn: true,
+      github: true,
+      portfolio: true,
+      experience: true,
+      isActive: true,
+      isVerified: true,
+      createdAt: true,
+      resume: true,
+      company: true,
+    },
+  });
+
+  res.json({
+    success: true,
+    data: { user },
+  });
+};
+
+export const getUserProfile = async (req: AuthRequest, res: Response) => {
+  const userId = req.params.id;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      avatar: true,
+      phone: true,
+      location: true,
+      skills: true,
+      bio: true,
+      education: true,
+      linkedIn: true,
+      github: true,
+      portfolio: true,
+      experience: true,
+      isActive: true,
+      isVerified: true,
+      createdAt: true,
+      resume: true,
+      company: true,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  res.json({
+    success: true,
+    data: { user },
+  });
+};
 
 export const uploadAvatar = async (req: AuthRequest, res: Response) => {
   await prisma.user.update({

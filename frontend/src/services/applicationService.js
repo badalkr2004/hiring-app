@@ -1,58 +1,14 @@
 import { mockJobs } from "../data/mockJobs";
+import { api } from "../libs/apis";
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Mock applications data
-const mockApplications = [
-  {
-    id: "1",
-    jobId: "1",
-    userId: "3",
-    companyId: "1",
-    status: "pending",
-    appliedDate: "2025-01-16",
-    coverLetter: "I am very interested in this position...",
-    user: {
-      id: "3",
-      email: "john@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      role: "user",
-      createdAt: "2024-02-01",
-      isActive: true,
-      location: "New York, NY",
-      skills: ["React", "TypeScript", "Node.js"],
-      experience: "5 years",
-    },
-    job: mockJobs[0],
-  },
-  {
-    id: "2",
-    jobId: "2",
-    userId: "3",
-    companyId: "1",
-    status: "reviewed",
-    appliedDate: "2025-01-15",
-    user: {
-      id: "3",
-      email: "john@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      role: "user",
-      createdAt: "2024-02-01",
-      isActive: true,
-      location: "New York, NY",
-      skills: ["React", "TypeScript", "Node.js"],
-      experience: "5 years",
-    },
-    job: mockJobs[1],
-  },
-];
 
 export const applicationService = {
   async getApplicationsByCompany(companyId) {
-    await delay(500);
-    return mockApplications.filter((app) => app.companyId === companyId);
+    const response = await api.get("/applications/company-applications");
+    return response.data.applications;
   },
 
   async getApplicationsByUser(userId) {
@@ -61,8 +17,8 @@ export const applicationService = {
   },
 
   async getAllApplications() {
-    await delay(500);
-    return mockApplications;
+    const response = await api.get("/applications/company-applications");
+    return response.data.applications;
   },
 
   async updateApplicationStatus(applicationId, status) {

@@ -43,7 +43,7 @@ async function apiRequest(endpoint, options = {}) {
         success: false,
         message: responseData.error.message || "Something went wrong",
         status: response.status,
-      }
+      };
     }
 
     return responseData;

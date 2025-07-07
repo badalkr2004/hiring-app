@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { validate } from "@/middleware/validation";
-import { authenticate } from "@/middleware/auth";
+import { authenticate, authorize } from "@/middleware/auth";
 import {
   getAllUsers,
+  getUserProfile,
   updateProfile,
+  updateProfilebyAdmin,
   uploadAvatar,
   uploadResume,
 } from "@/controllers/userController";
@@ -48,6 +50,37 @@ router.get(
     ]),
   ],
   getAllUsers
+);
+
+// update user profile by admin
+
+router.get(
+  "/profile/:id",
+  authenticate,
+  authorize("ADMIN"),
+  validate([param("id").isUUID().withMessage("Invalid user ID")]),
+  getUserProfile
+);
+router.put(
+  "/profile/:id",
+  [
+    authenticate,
+    authorize("ADMIN"),
+    validate([
+      body("firstName").optional().trim().isLength({ min: 1 }),
+      body("lastName").optional().trim().isLength({ min: 1 }),
+      body("phone").optional().trim(),
+      body("location").optional().trim(),
+      body("skills").optional().isArray(),
+      body("experience").optional().trim(),
+      body("bio").optional().trim(),
+      body("education").optional().trim(),
+      body("linkedIn").optional().trim(),
+      body("github").optional().trim(),
+      body("portfolio").optional().trim(),
+    ]),
+  ],
+  updateProfilebyAdmin
 );
 
 // Upload avatar
