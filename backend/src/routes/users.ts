@@ -19,9 +19,7 @@ import {
   uploadCommunityImages,
   uploadResumeFile,
 } from "@/middleware/upload";
-import { handleUploadError } from "@/middleware/uploadErrorHandler";
-import { createCommunity } from "@/controllers/communityController";
-import { sendMessage } from "@/controllers/chatController";
+
 const router = Router();
 
 // Update profile
@@ -63,11 +61,7 @@ router.get(
 );
 
 // get all users for chat and other features
-router.get(
-  "/",
-  authenticate,
-  getAllUsers
-);
+router.get("/", authenticate, getAllUsers);
 
 // update user profile by admin
 
@@ -112,36 +106,6 @@ router.post(
   uploadResume
 );
 
-router.patch(
-  "/avatar",
-  uploadAvatarFile.single("avatar"),
-  handleUploadError,
-  updateUserAvatar
-);
-router.patch(
-  "/resume",
-  uploadResumeFile.single("resume"),
-  handleUploadError,
-  updateUserResume
-);
-
-// routes/community.ts
-router.post(
-  "/",
-  uploadCommunityImages.fields([
-    { name: "avatar", maxCount: 1 },
-    { name: "banner", maxCount: 1 },
-  ]),
-  handleUploadError,
-  createCommunity
-);
-
 // routes/chat.ts
-router.post(
-  "/:chatId/messages",
-  uploadChatFile.single("file"),
-  handleUploadError,
-  sendMessage
-);
 
 export default router;

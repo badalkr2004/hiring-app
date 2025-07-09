@@ -19,8 +19,7 @@ import companyRoutes from "@/routes/companies";
 import jobRoutes from "@/routes/jobs";
 import applicationRoutes from "@/routes/applications";
 import adminRoutes from "@/routes/admin";
-// import chatRoutes from "@/routes/chat";
-// import communityRoutes from "@/routes/community";
+
 import chatRoutes from "@/routes/newChat";
 
 // Load environment variables
