@@ -33,6 +33,7 @@ model User {
   lastLogin  DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  emailOtp   String?
 
   // Relations
   applications        Application[]

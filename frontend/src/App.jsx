@@ -25,9 +25,13 @@ import AdminUserProfile from "./components/dashboards/superAdmin/AdminUserProfil
 import AdminCompanyList from "./components/dashboards/superAdmin/CompanyList";
 import AdminCompanyView from "./components/dashboards/superAdmin/AdminCompanyProfile";
 import AdminCompanyEdit from "./components/dashboards/superAdmin/AdminCompanyEdit";
+
 import EmployerChat from "./features/components/job/EmployerChat";
 import Chat from "./features/pages/Chat";
 import { ChatProvider } from "./features/context/ChatContext";
+import CompaniesPage from "./pages/CompaniesPage";
+import CompanyDetailPage from "./pages/CompanyDetailPage";
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -153,18 +157,24 @@ function App() {
                   }
                 />
 
+
                 <Route path="/messages" element={<Chat />} />
                 <Route
                   path="/jobs/:jobId/chat/:employerId"
                   element={<EmployerChat />}
                 />
 
-                {/* Redirect unknown routes */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
-          </Router>
-        </ChatProvider>
+            
+              <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/companies/:id" element={<CompanyDetailPage />} /> 
+
+
+              {/* Redirect unknown routes */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </Router>
+     </ChatProvider>
       </AuthProvider>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
