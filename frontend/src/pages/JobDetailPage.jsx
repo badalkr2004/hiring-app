@@ -15,16 +15,17 @@ import {
   Eye,
   Briefcase,
   Zap,
+  Check,
 } from "lucide-react";
 import { useApiQuery } from "../libs/useApi";
 import { useState, useEffect } from "react";
-import ChatWithEmployerButton from "../features/components/job/ChatWithEmployerButton";
 
 const JobDetailPage = () => {
   const { id } = useParams();
   const { data, isLoading, error } = useApiQuery(`/jobs/${id}`);
 
   const [job, setJob] = useState(null);
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     if (data?.success) {
@@ -102,6 +103,35 @@ const JobDetailPage = () => {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: job.title,
+      text: `${job.title} at ${job.company.name} - ${job.location}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: copy URL to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Fallback: copy URL to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (clipboardError) {
+        console.error('Error copying to clipboard:', clipboardError);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -149,11 +179,21 @@ const JobDetailPage = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <button className="p-3 bg-white/20 rounded-xl hover:bg-white/30 transition-all duration-200 backdrop-blur-sm">
-                        <Bookmark className="h-5 w-5" />
-                      </button>
-                      <button className="p-3 bg-white/20 rounded-xl hover:bg-white/30 transition-all duration-200 backdrop-blur-sm">
-                        <Share2 className="h-5 w-5" />
+                      <button
+                        onClick={handleShare}
+                        className="p-3 bg-white/20 rounded-xl hover:bg-white/30 transition-all duration-200 backdrop-blur-sm relative"
+                        title="Share this job"
+                      >
+                        {copied ? (
+                          <Check className="h-5 w-5" />
+                        ) : (
+                          <Share2 className="h-5 w-5" />
+                        )}
+                        {copied && (
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                            URL copied!
+                          </span>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -267,14 +307,8 @@ const JobDetailPage = () => {
                   Apply Now
                 </button>
                 <button className="w-full border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium">
-                  Save for Later
+                  Chat with Employer
                 </button>
-                <div className="w-full border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium">
-                  <ChatWithEmployerButton
-                    jobId={id}
-                    employerId={data?.data?.job.company.userId}
-                  />
-                </div>
               </div>
             </div>
 

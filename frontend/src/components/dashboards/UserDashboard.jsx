@@ -1,19 +1,29 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useMemo, useState, useEffect } from "react";
 import { Briefcase, FileText, Clock, CheckCircle, X, Eye } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { applicationService } from "../../services/applicationService";
+import { useApiQuery } from "../../libs/useApi";
 
 const UserDashboard = () => {
   const { userData } = useAuth();
-  const { data: applications = [], isLoading } = useQuery({
-    queryKey: ["user-applications", userData?.id],
-    queryFn: () => applicationService.getApplicationsByUser(userData.id),
-    enabled: !!userData,
-  });
+  const [page, setPage] = useState(1);
+  const [limit] = useState(5); // You can adjust this as needed
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Fetch applications with pagination
+  const { data, isLoading } = useApiQuery(
+    `/applications/my-applications?page=${page}&limit=${limit}`
+  );
+  const applications = useMemo(() => data?.data?.applications ?? [], [data]);
+
+  useEffect(() => {
+    if (data?.data?.pagination?.pages) {
+      setTotalPages(data.data.pagination.pages);
+    }
+  }, [data]);
 
   const getStatusColor = (status) => {
-    switch (status) {
+    const normalizedStatus = status?.toLowerCase();
+    switch (normalizedStatus) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "reviewed":
@@ -30,7 +40,8 @@ const UserDashboard = () => {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
+    const normalizedStatus = status?.toLowerCase();
+    switch (normalizedStatus) {
       case "pending":
         return <Clock className="h-4 w-4" />;
       case "reviewed":
@@ -55,20 +66,32 @@ const UserDashboard = () => {
     },
     {
       label: "Pending Review",
-      value: applications.filter((app) => app.status === "pending").length,
+      value: applications.filter((app) => app.status?.toLowerCase() === "pending").length,
       icon: Clock,
       color: "text-yellow-600",
     },
     {
+      label: "Reviewed",
+      value: applications.filter((app) => app.status?.toLowerCase() === "reviewed").length,
+      icon: Eye,
+      color: "text-blue-600",
+    },
+    {
       label: "Shortlisted",
-      value: applications.filter((app) => app.status === "shortlisted").length,
+      value: applications.filter((app) => app.status?.toLowerCase() === "shortlisted").length,
       icon: CheckCircle,
       color: "text-green-600",
     },
     {
-      label: "Interviews",
-      value: applications.filter((app) => app.status === "reviewed").length,
-      icon: Briefcase,
+      label: "Rejected",
+      value: applications.filter((app) => app.status?.toLowerCase() === "rejected").length,
+      icon: X,
+      color: "text-red-600",
+    },
+    {
+      label: "Hired",
+      value: applications.filter((app) => app.status?.toLowerCase() === "hired").length,
+      icon: CheckCircle,
       color: "text-purple-600",
     },
   ];
@@ -86,33 +109,31 @@ const UserDashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
                 key={index}
-                className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
+                className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex flex-col items-center justify-center hover:shadow-md transition-shadow"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
-                      {stat.label}
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">
-                      {stat.value}
-                    </p>
-                  </div>
+                <div className="flex items-center justify-center mb-2">
                   <Icon className={`h-8 w-8 ${stat.color}`} />
                 </div>
+                <p className="text-sm font-medium text-gray-500 text-center">
+                  {stat.label}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1 text-center">
+                  {stat.value}
+                </p>
               </div>
             );
           })}
         </div>
 
         {/* Recent Applications */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6 border-b border-gray-100">
             <h2 className="text-xl font-semibold text-gray-900">
               Recent Applications
             </h2>
@@ -146,13 +167,13 @@ const UserDashboard = () => {
               </button>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
-              {applications.map((application) => (
-                <div
-                  key={application.id}
-                  className="p-6 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <div className="flex items-center justify-between">
+            <>
+              <div className="divide-y divide-gray-100">
+                {applications.map((application) => (
+                  <div
+                    key={application.id}
+                    className="p-6 hover:bg-gray-50 transition-colors duration-200 flex flex-col md:flex-row md:items-center md:justify-between"
+                  >
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
                         <Briefcase className="h-6 w-6 text-white" />
@@ -162,33 +183,50 @@ const UserDashboard = () => {
                           {application.job.title}
                         </h3>
                         <p className="text-gray-600">
-                          {application.job.company}
+                          {application.job.company?.name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          Applied on{" "}
-                          {new Date(
-                            application.appliedDate
-                          ).toLocaleDateString()}
+                          Applied on {new Date(application.appliedDate).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-4 mt-4 md:mt-0">
                       <span
                         className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
                           application.status
                         )}`}
                       >
                         {getStatusIcon(application.status)}
-                        <span className="capitalize">{application.status}</span>
+                        <span className="capitalize">{application.status?.toLowerCase()}</span>
                       </span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">
                         View Details
                       </button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {/* Pagination Controls */}
+              <div className="flex justify-center items-center gap-2 py-6">
+                <button
+                  className="px-4 py-2 rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </button>
+                <span className="text-gray-600 mx-2">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  className="px-4 py-2 rounded border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
