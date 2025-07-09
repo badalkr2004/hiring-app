@@ -106,6 +106,7 @@ export const getJobById = async (req: Request, res: Response) => {
           industry: true,
           location: true,
           verified: true,
+          userId: true, // ✅ Add employer user ID here
         },
       },
       _count: {
