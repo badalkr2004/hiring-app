@@ -1,5 +1,5 @@
 // src/components/chat/ChatList.jsx
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import ChatItem from "./ChatItem";
 import { useChat } from "../../context/ChatContext";
 import { useAuth } from "../../../contexts/AuthContext";
