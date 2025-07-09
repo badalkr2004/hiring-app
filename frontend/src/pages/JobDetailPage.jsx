@@ -18,10 +18,12 @@ import {
 } from "lucide-react";
 import { useApiQuery } from "../libs/useApi";
 import { useState, useEffect } from "react";
+import ChatWithEmployerButton from "../features/components/job/ChatWithEmployerButton";
 
 const JobDetailPage = () => {
   const { id } = useParams();
   const { data, isLoading, error } = useApiQuery(`/jobs/${id}`);
+
   const [job, setJob] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -267,6 +269,12 @@ const JobDetailPage = () => {
                 <button className="w-full border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium">
                   Save for Later
                 </button>
+                <div className="w-full border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 font-medium">
+                  <ChatWithEmployerButton
+                    jobId={id}
+                    employerId={data?.data?.job.company.userId}
+                  />
+                </div>
               </div>
             </div>
 
