@@ -14,13 +14,13 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  
+
   const setTokens = useCallback((access) => {
     setAccessToken(access);
     setIsLoggedIn(true);
     localStorage.setItem("accessToken", access);
   }, []);
-  
+
   // Update userData and store in localStorage
   const updateUserData = useCallback((user) => {
     setUserData(user);
@@ -37,36 +37,39 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("accessToken");
   }, [updateUserData]);
 
-  const validateToken = useCallback(async (token) => {
-    if (!token) {
-      clearTokens();
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const response = await api.get("/auth/profile", {
-        token: token,
-      });
-
-      if (!response.success) {
-        throw new Error("Token validation failed");
+  const validateToken = useCallback(
+    async (token) => {
+      if (!token) {
+        clearTokens();
+        return;
       }
 
-      updateUserData(response.data.user);
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.error("Token validation error:", error);
-      clearTokens();
-    } finally {
-      setIsLoading(false);
-    }
-  }, [clearTokens, updateUserData]);
+      try {
+        setIsLoading(true);
+        const response = await api.get("/auth/profile", {
+          token: token,
+        });
+
+        if (!response.success) {
+          throw new Error("Token validation failed");
+        }
+
+        updateUserData(response.data.user);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error("Token validation error:", error);
+        clearTokens();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [clearTokens, updateUserData]
+  );
 
   useEffect(() => {
     const storedAccess = localStorage.getItem("accessToken");
     const storedUserData = localStorage.getItem("userData");
-    
+
     if (storedUserData) {
       try {
         const parsedUserData = JSON.parse(storedUserData);
@@ -76,7 +79,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("userData");
       }
     }
-    
+
     if (storedAccess) {
       setAccessToken(storedAccess);
       validateToken(storedAccess);
