@@ -13,6 +13,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const JobApplyPage = () => {
   const { id: jobId } = useParams();
@@ -21,6 +22,7 @@ const JobApplyPage = () => {
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeUrl, setResumeUrl] = useState("");
   const [message, setMessage] = useState({ type: "", text: "" });
+  const queryClient = useQueryClient();
 
   // Fetch job details
   const { data: jobData, isLoading: jobLoading } = useApiQuery(
@@ -53,7 +55,7 @@ const JobApplyPage = () => {
             type: "success",
             text: "Application submitted successfully!",
           });
-          setTimeout(() => navigate(`/jobs/${jobId}`), 2000);
+          queryClient.invalidateQueries({ queryKey: [`/applications/applied/status?jobId=${jobId}`] });
         },
         onError: (err) => {
           setMessage({
@@ -75,9 +77,9 @@ const JobApplyPage = () => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "c7rtf3gv");
-      formData.append("resource_type", "auto");
+      formData.append("resource_type", "raw")
       const response = await handleResumeUpload(formData);
-      if (response.url) {
+      if (response.secure_url) {
         setResumeUrl(response.secure_url);
         setMessage({ type: "success", text: "Resume uploaded!" });
       } else {
@@ -124,7 +126,7 @@ const JobApplyPage = () => {
       <div className="min-h-[calc(100vh-100px)] flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
         <div className="bg-white rounded-2xl shadow-xl p-10 max-w-md text-center">
           <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">You've already applied!</h2>
+          <h2 className="text-2xl font-bold mb-2">Application Submitted</h2>
           <p className="text-gray-600 mb-6">
             Thank you for your interest. We'll be in touch if you're
             shortlisted.

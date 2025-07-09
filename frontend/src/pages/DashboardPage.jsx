@@ -9,6 +9,10 @@ const DashboardPage = () => {
 
   if (!userData) return null;
 
+  useEffect(() => {
+    document.title = "Job Flow - Dashboard";
+  }, []);
+
   switch (userData.role) {
     case 'USER':
       return <UserDashboard />;

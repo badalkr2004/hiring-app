@@ -9,6 +9,7 @@ import {
   logout,
   getProfile,
   changePassword,
+  verifyEmail,
 } from "@/controllers/authController";
 
 const router = Router();
@@ -38,6 +39,18 @@ router.post(
     ]),
   ],
   register
+);
+
+// Verify email
+router.post(
+  "/verify-email",
+  [
+    validate([
+      body("email").isEmail().normalizeEmail(),
+      body("otp").notEmpty().withMessage("OTP is required"),
+    ]),
+  ],
+  verifyEmail
 );
 
 // Login

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react"; 
 import {
   Briefcase,
   Users,
@@ -14,35 +13,25 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { applicationService } from "../../services/applicationService";
 import { useApiQuery } from "../../libs/useApi";
 
 const CompanyDashboard = () => {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [jobs, setJobs] = useState([]);
   const navigate = useNavigate();
 
-  const { data: applications = [], isLoading: applicationsLoading } = useQuery({
-    queryKey: ["company-applications", user?.id],
-    queryFn: () => applicationService.getApplicationsByCompany(user.id),
-    enabled: !!user,
-  });
-
+  const { userData } = useAuth();
+  const [recentApplications, setRecentApplications] = useState([]);
+  const { data: recentApplicationsData = [], isLoading: recentApplicationsLoading } = useApiQuery(`/applications/recent/${userData.company.id}`)
   const { data: jobData = [], isLoading: jobsLoading } = useApiQuery(`/jobs/company/my-jobs`);
+
   useEffect(() => {
     if(jobData?.success) {
       setJobs(jobData.data.jobs);
     }
-  }, [jobData]);
-
-  const updateApplicationMutation = useMutation({
-    mutationFn: ({ applicationId, status }) =>
-      applicationService.updateApplicationStatus(applicationId, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["company-applications"] });
-    },
-  });
+    if(recentApplicationsData?.success) {
+      setRecentApplications(recentApplicationsData.data.applications);
+    }
+  }, [jobData, recentApplicationsData]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -61,10 +50,6 @@ const CompanyDashboard = () => {
     }
   };
 
-  const handleStatusUpdate = (applicationId, status) => {
-    updateApplicationMutation.mutate({ applicationId, status });
-  };
-
   const stats = [
     {
       label: "Active Jobs",
@@ -74,19 +59,19 @@ const CompanyDashboard = () => {
     },
     {
       label: "Total Applications",
-      value: applications.length,
+      value: recentApplications.length,
       icon: Users,
       color: "text-green-600",
     },
     {
       label: "Pending Review",
-      value: applications.filter((app) => app.status === "pending").length,
+      value: recentApplications.filter((app) => app.status === "pending").length,
       icon: Clock,
       color: "text-yellow-600",
     },
     {
       label: "Shortlisted",
-      value: applications.filter((app) => app.status === "shortlisted").length,
+      value: recentApplications.filter((app) => app.status === "shortlisted").length,
       icon: CheckCircle,
       color: "text-purple-600",
     },
@@ -147,7 +132,7 @@ const CompanyDashboard = () => {
               </h2>
             </div>
 
-            {applicationsLoading ? (
+            {recentApplicationsLoading ? (
               <div className="p-6">
                 <div className="animate-pulse space-y-4">
                   {[...Array(3)].map((_, i) => (
@@ -161,7 +146,7 @@ const CompanyDashboard = () => {
                   ))}
                 </div>
               </div>
-            ) : applications.length === 0 ? (
+            ) : recentApplications.length === 0 ? (
               <div className="p-12 text-center">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -173,9 +158,9 @@ const CompanyDashboard = () => {
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
-                {applications.slice(0, 5).map((application) => (
-                  <div key={application.id} className="p-4">
+              <div className="divide-y divide-gray-200 max-h-[500px] overflow-y-auto">
+                {recentApplications.slice(0, 10).map((application) => (
+                  <div key={application.id} className="p-4 hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/dashboard/jobs/${application.job.id}/?applicantId=${application.user.id}`)}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
@@ -186,12 +171,27 @@ const CompanyDashboard = () => {
                         </div>
                         <div>
                           <h4 className="font-medium text-gray-900">
-                            {application.user.firstName}{" "}
-                            {application.user.lastName}
+                            {application.user.firstName} {application.user.lastName}
                           </h4>
+                          <p className="text-sm text-gray-600">
+                            {application.user.email}
+                          </p>
                           <p className="text-sm text-gray-600">
                             {application.job.title}
                           </p>
+                          <p className="text-xs text-gray-400">
+                            Applied on {new Date(application.createdAt).toLocaleDateString()}
+                          </p>
+                          {application.resume && (
+                            <a
+                              href={application.resume}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline text-xs"
+                            >
+                              View Resume
+                            </a>
+                          )}
                         </div>
                       </div>
                       <span
@@ -201,36 +201,6 @@ const CompanyDashboard = () => {
                       >
                         {application.status}
                       </span>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() =>
-                          handleStatusUpdate(application.id, "reviewed")
-                        }
-                        className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
-                      >
-                        <Eye className="h-4 w-4" />
-                        <span>Review</span>
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleStatusUpdate(application.id, "shortlisted")
-                        }
-                        className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center space-x-1"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                        <span>Shortlist</span>
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleStatusUpdate(application.id, "rejected")
-                        }
-                        className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center space-x-1"
-                      >
-                        <X className="h-4 w-4" />
-                        <span>Reject</span>
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -280,12 +250,12 @@ const CompanyDashboard = () => {
                 </Link>
               </div>
             ) : (
-              <div className="p-4 grid gap-6">
-                {jobs.slice(0, 2).map((job) => (
+              <div className="p-4 grid gap-6 max-h-[500px] overflow-y-auto">
+                {jobs.slice(0, 10).map((job) => (
                   <div
                     key={job.id}
                     className="cursor-pointer relative bg-white rounded-2xl shadow-md border-l-4 border-blue-500 p-6 flex flex-col gap-3 hover:shadow-lg transition-shadow duration-200"
-                    onClick={() => navigate(`/jobs/${job.id}`)}
+                    onClick={() => navigate(`/dashboard/jobs/${job.id}`)}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
