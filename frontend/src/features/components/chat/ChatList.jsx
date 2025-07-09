@@ -19,7 +19,6 @@ const ChatList = () => {
 
   // Re-fetch chats when the component mounts to ensure fresh data
   useEffect(() => {
-    s;
     fetchChats();
   }, [fetchChats]);
 

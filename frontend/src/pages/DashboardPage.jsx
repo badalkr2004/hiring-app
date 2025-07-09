@@ -1,8 +1,8 @@
-import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import UserDashboard from '../components/dashboards/UserDashboard';
-import CompanyDashboard from '../components/dashboards/CompanyDashboard';
-import AdminDashboard from '../components/dashboards/AdminDashboard';
+import { useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import UserDashboard from "../components/dashboards/UserDashboard";
+import CompanyDashboard from "../components/dashboards/CompanyDashboard";
+import AdminDashboard from "../components/dashboards/AdminDashboard";
 
 const DashboardPage = () => {
   const { userData } = useAuth();
@@ -14,11 +14,11 @@ const DashboardPage = () => {
   }, []);
 
   switch (userData.role) {
-    case 'USER':
+    case "USER":
       return <UserDashboard />;
-    case 'COMPANY':
+    case "COMPANY":
       return <CompanyDashboard />;
-    case 'ADMIN':
+    case "ADMIN":
       return <AdminDashboard />;
     default:
       return <div>Invalid user role</div>;
