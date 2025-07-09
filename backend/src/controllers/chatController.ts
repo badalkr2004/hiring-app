@@ -42,6 +42,7 @@ export const createDirectChat = async (req: AuthRequest, res: Response) => {
 
     if (existingChat) {
       res.json(existingChat);
+      return;
     }
 
     // Create new direct chat

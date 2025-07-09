@@ -44,7 +44,7 @@ app.use(helmet());
 //   standardHeaders: true,
 //   legacyHeaders: false,
 // });
-app.options("*", cors());
+// app.options("*", cors());
 // app.use("/api/", limiter);
 
 // CORS configuration
