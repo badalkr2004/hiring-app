@@ -25,6 +25,8 @@ import AdminUserProfile from "./components/dashboards/superAdmin/AdminUserProfil
 import AdminCompanyList from "./components/dashboards/superAdmin/CompanyList";
 import AdminCompanyView from "./components/dashboards/superAdmin/AdminCompanyProfile";
 import AdminCompanyEdit from "./components/dashboards/superAdmin/AdminCompanyEdit";
+import CompaniesPage from "./pages/CompaniesPage";
+import CompanyDetailPage from "./pages/CompanyDetailPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -147,6 +149,9 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+
+              <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/companies/:id" element={<CompanyDetailPage />} /> 
 
               {/* Redirect unknown routes */}
               <Route path="*" element={<Navigate to="/" replace />} />

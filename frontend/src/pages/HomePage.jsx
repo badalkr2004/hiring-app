@@ -47,6 +47,7 @@ const HomePage = () => {
       setIsLoading(false);
     };
     fetchJobs();
+    document.title = "Job Flow - Home";
   }, [filters, page]);
 
   const stats = [

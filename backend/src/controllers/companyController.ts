@@ -82,6 +82,9 @@ export const getCompanyById = async (req: Request, res: Response) => {
           location: true,
           type: true,
           salary: true,
+          description: true,
+          category: true,
+          featured: true,
           createdAt: true,
           _count: {
             select: {

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { MapPin, Clock, DollarSign, Star, Building } from "lucide-react";
 
-const JobCard = ({ job }) => {
+const JobCard = ({ job, style }) => {
   const navigate = useNavigate();
   const getTypeColor = (type) => {
     switch (type) {
@@ -29,7 +29,7 @@ const JobCard = ({ job }) => {
 
   return (
     <Link to={`/jobs/${job.id}`}>
-      <div className="bg-white rounded-xl border border-gray-200 p-6 transition-all duration-300 hover:shadow-lg hover:border-blue-200 hover:-translate-y-1 group cursor-pointer">
+      <div style={{...style}} className="bg-white rounded-xl border border-gray-200 p-6 transition-all duration-300 hover:shadow-lg hover:border-blue-200 hover:-translate-y-1 group cursor-pointer">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
@@ -37,11 +37,11 @@ const JobCard = ({ job }) => {
             </div>
             <div>
               <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
-                {job.title.length > 20
+                {job.title?.length > 20
                   ? job.title.slice(0, 20) + "..."
-                  : job.title}
+                  : job.title || 'Untitled Job'}
               </h3>
-              <p className="text-gray-600">{job.company.name}</p>
+              <p className="text-gray-600">{job.company?.name || 'Company'}</p>
             </div>
           </div>
           {job.featured && (
@@ -56,9 +56,9 @@ const JobCard = ({ job }) => {
           <div className="flex items-center space-x-1">
             <MapPin className="h-4 w-4" />
             <span>
-              {job.location.length > 10
+              {job.location?.length > 10
                 ? job.location.slice(0, 10) + "..."
-                : job.location}
+                : job.location || 'Remote'}
             </span>
           </div>
           <div className="flex items-center space-x-1">
@@ -67,14 +67,14 @@ const JobCard = ({ job }) => {
           </div>
           <div className="flex items-center space-x-1">
             <DollarSign className="h-4 w-4" />
-            <span>{job.salary.length > 16 ? job.salary.slice(0, 16) + "..." : job.salary}</span>
+            <span>{job.salary?.length > 16 ? job.salary.slice(0, 16) + "..." : job.salary || 'Salary not specified'}</span>
           </div>
         </div>
 
         <p className="text-gray-700 mb-4 line-clamp-3">
-          {job.description.length > 125
+          {job.description?.length > 125
             ? job.description.slice(0, 125) + "..."
-            : job.description}
+            : job.description || 'No description available'}
         </p>
 
         <div className="flex items-center justify-between">
@@ -84,12 +84,12 @@ const JobCard = ({ job }) => {
                 job.type
               )}`}
             >
-              {job.type.replace("_", " ").toUpperCase()}
+              {job.type?.replace("_", " ").toUpperCase() || 'FULL-TIME'}
             </span>
             <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-              {job.category.length > 15
+              {job.category?.length > 15
                 ? job.category.slice(0, 15) + "..."
-                : job.category}
+                : job.category || 'General'}
             </span>
           </div>
           <button className="text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:underline transition-all duration-200" onClick={() => navigate(`/jobs/${job.id}/apply`)}>

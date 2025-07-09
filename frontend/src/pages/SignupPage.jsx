@@ -28,6 +28,8 @@ const SignupPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoadings, setIsLoadings] = useState(false);
   const [error, setError] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   const { setUserData, setTokens, userData, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -51,6 +53,27 @@ const SignupPage = () => {
 
     try {
       const response = await api.post("/auth/register", formData);
+      if (response.success) {
+        setIsOtpSent(true);
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoadings(false);
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoadings(true);
+    setError("");
+    try {
+      const response = await api.post("/auth/verify-email", {
+        email: formData.email,
+        otp: otp,
+      });
       if (response.success) {
         setUserData(response.data.user);
         setTokens(response.data.accessToken);
@@ -152,7 +175,7 @@ const SignupPage = () => {
             <p className="mb-6 text-sm text-gray-600 text-center">
               Sign up to start hiring or finding jobs
             </p>
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={isOtpSent ? handleOtpSubmit : handleSubmit} className="space-y-8">
               {/* Role Selection */}
               <div>
                 <div className="mb-2 text-sm font-semibold text-gray-700">
@@ -359,6 +382,27 @@ const SignupPage = () => {
                   </div>
                 </div>
               </div>
+              {isOtpSent && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    OTP
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                      type="text"
+                      required
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      maxLength={6}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-gray-50 tracking-widest"
+                      placeholder="Enter OTP"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -392,7 +436,11 @@ const SignupPage = () => {
                 disabled={isLoadings || isLoading}
                 className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-md"
               >
-                {isLoadings ? "Creating account..." : "Create Account"}
+                {isLoadings
+                  ? "Creating account..."
+                  : isOtpSent
+                  ? "Verify OTP"
+                  : "Create Account"}
               </button>
             </form>
 

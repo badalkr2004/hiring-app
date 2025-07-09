@@ -10,6 +10,7 @@ import {
 import { AuthRequest } from "@/middleware/auth";
 import { ApiError } from "@/utils/ApiError";
 import { validationResult } from "express-validator";
+import { sendMail } from "@/utils/mail";
 
 export const register = async (req: Request, res: Response) => {
   const {
@@ -28,21 +29,51 @@ export const register = async (req: Request, res: Response) => {
     where: { email },
   });
 
-  if (existingUser) {
+  if (existingUser && existingUser.isVerified) {
     throw new ApiError("User already exists with this email", 409);
   }
 
   // Hash password
   const hashedPassword = await hashPassword(password);
 
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
   // Create user
-  const user = await prisma.user.create({
-    data: {
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {
+      password: hashedPassword,
+      firstName,
+      lastName,
+      role,
+      emailOtp: otp,
+      isVerified: false,
+      ...(role === UserRole.COMPANY &&
+        companyName && {
+          company: {
+            upsert: {
+              update: {
+                name: companyName,
+                size: companySize,
+                industry,
+              },
+              create: {
+                name: companyName,
+                size: companySize,
+                industry,
+              },
+            },
+          },
+        }),
+    },
+    create: {
       email,
       password: hashedPassword,
       firstName,
       lastName,
       role,
+      emailOtp: otp,
       ...(role === UserRole.COMPANY &&
         companyName && {
           company: {
@@ -57,6 +88,67 @@ export const register = async (req: Request, res: Response) => {
     include: {
       company: true,
     },
+  });
+
+  // send otp to email
+  const body = `
+    <div style="font-family: Arial, sans-serif; background: #f6f8fa; padding: 40px 0;">
+      <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px;">
+        <div style="text-align: center;">
+          <img src="https://img.icons8.com/color/96/000000/lock--v1.png" alt="OTP" style="margin-bottom: 16px;" />
+          <h2 style="color: #22223b; margin-bottom: 8px;">Verify Your Email Address</h2>
+          <p style="color: #4a4e69; font-size: 16px; margin-bottom: 24px;">
+            Please use the following One-Time Password (OTP) to verify your email address:
+          </p>
+          <div style="display: inline-block; background: #f2e9e4; border-radius: 6px; padding: 18px 32px; margin-bottom: 24px;">
+            <span style="font-size: 32px; letter-spacing: 8px; color: #22223b; font-weight: bold;">${otp}</span>
+          </div>
+          <p style="color: #9a8c98; font-size: 14px; margin-top: 0;">
+            This OTP is valid for 10 minutes. If you did not request this, please ignore this email.
+          </p>
+        </div>
+        <hr style="border: none; border-top: 1px solid #e0e1dd; margin: 32px 0 16px 0;">
+        <p style="color: #bfc0c0; font-size: 12px; text-align: center;">
+          &copy; ${new Date().getFullYear()} Job Flow. All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
+
+  await sendMail(user.email, "OTP for email verification", body);
+
+  res.status(201).json({
+    success: true,
+    data: {
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+      message: "OTP sent to your email",
+    },
+  });
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  const { email, otp } = req.body;
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  if (user.emailOtp !== otp) {
+    throw new ApiError("Invalid OTP", 400);
+  }
+  
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { isVerified: true, emailOtp: null },
   });
 
   // Generate tokens
@@ -81,13 +173,14 @@ export const register = async (req: Request, res: Response) => {
   // Remove password from response
   const { password: _, ...userWithoutPassword } = user;
 
-  res.status(201).json({
+  res.json({
     success: true,
     data: {
       user: userWithoutPassword,
       accessToken,
       refreshToken,
     },
+    message: "Email verified successfully",
   });
 };
 
