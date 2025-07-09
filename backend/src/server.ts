@@ -96,7 +96,7 @@ app.use("/api/applications", applicationRoutes);
 app.use("/api/admin", adminRoutes);
 // app.use("/api/chats", chatRoutes);
 // app.use("/api/communities", communityRoutes);
-app.use("/message", chatRoutes);
+app.use("/api/messages", chatRoutes);
 
 // 404 handler
 app.use(notFound);
