@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { api } from "../libs/apis";
 import { useParams, useSearchParams } from "react-router-dom";
+import ChatButton from "../components/chat/ChatButton";
 
 const statusColors = {
   REVIEW: "bg-purple-100 text-purple-700",
@@ -61,6 +62,7 @@ const ViewAllApplicants = ({ jobId }) => {
   const [searchParams] = useSearchParams();
   const applicantId = searchParams.get("applicantId");
   const [applications, setApplications] = useState([]);
+  console.log(applications);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -343,6 +345,9 @@ const ViewAllApplicants = ({ jobId }) => {
                       }`}
                     />
                   </button>
+                  <div className="p-2 rounded-lg hover:bg-blue-100 transition-colors">
+                    <ChatButton text={"Chat"} applicationId={selected.id} />
+                  </div>
                 </div>
               </div>
               {/* Details Card */}

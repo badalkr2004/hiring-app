@@ -78,6 +78,7 @@ const CompanySettings = () => {
         formData.append("upload_preset", "c7rtf3gv");
         const response = await handleUpload(formData);
         logo = response.secure_url;
+        console.log(logo);
       }
 
       const response = await api.put("/companies/profile", {
@@ -147,7 +148,6 @@ const CompanySettings = () => {
       } else {
         setMessage({ type: "error", text: response.message });
       }
-
     } catch (error) {
       setMessage({
         type: "error",

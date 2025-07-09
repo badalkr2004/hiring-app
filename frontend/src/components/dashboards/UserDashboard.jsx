@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { Briefcase, FileText, Clock, CheckCircle, X, Eye } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useApiQuery } from "../../libs/useApi";
+import ChatButton from "../chat/ChatButton";
 
 const UserDashboard = () => {
   const { userData } = useAuth();
@@ -66,31 +67,40 @@ const UserDashboard = () => {
     },
     {
       label: "Pending Review",
-      value: applications.filter((app) => app.status?.toLowerCase() === "pending").length,
+      value: applications.filter(
+        (app) => app.status?.toLowerCase() === "pending"
+      ).length,
       icon: Clock,
       color: "text-yellow-600",
     },
     {
       label: "Reviewed",
-      value: applications.filter((app) => app.status?.toLowerCase() === "reviewed").length,
+      value: applications.filter(
+        (app) => app.status?.toLowerCase() === "reviewed"
+      ).length,
       icon: Eye,
       color: "text-blue-600",
     },
     {
       label: "Shortlisted",
-      value: applications.filter((app) => app.status?.toLowerCase() === "shortlisted").length,
+      value: applications.filter(
+        (app) => app.status?.toLowerCase() === "shortlisted"
+      ).length,
       icon: CheckCircle,
       color: "text-green-600",
     },
     {
       label: "Rejected",
-      value: applications.filter((app) => app.status?.toLowerCase() === "rejected").length,
+      value: applications.filter(
+        (app) => app.status?.toLowerCase() === "rejected"
+      ).length,
       icon: X,
       color: "text-red-600",
     },
     {
       label: "Hired",
-      value: applications.filter((app) => app.status?.toLowerCase() === "hired").length,
+      value: applications.filter((app) => app.status?.toLowerCase() === "hired")
+        .length,
       icon: CheckCircle,
       color: "text-purple-600",
     },
@@ -186,7 +196,10 @@ const UserDashboard = () => {
                           {application.job.company?.name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          Applied on {new Date(application.appliedDate).toLocaleDateString()}
+                          Applied on{" "}
+                          {new Date(
+                            application.appliedDate
+                          ).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -197,11 +210,19 @@ const UserDashboard = () => {
                         )}`}
                       >
                         {getStatusIcon(application.status)}
-                        <span className="capitalize">{application.status?.toLowerCase()}</span>
+                        <span className="capitalize">
+                          {application.status?.toLowerCase()}
+                        </span>
                       </span>
                       <button className="text-blue-600 hover:text-blue-700 font-medium">
                         View Details
                       </button>
+                      <div className="text-blue-600 hover:text-blue-700 font-medium">
+                        <ChatButton
+                          text={"Chat with Emloyer"}
+                          applicationId={application.id}
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
