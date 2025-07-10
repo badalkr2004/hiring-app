@@ -19,6 +19,7 @@ import companyRoutes from "@/routes/companies";
 import jobRoutes from "@/routes/jobs";
 import applicationRoutes from "@/routes/applications";
 import adminRoutes from "@/routes/admin";
+import communityRoutes from "@/routes/commnunityRoutes";
 
 import chatRoutes from "@/routes/newChat";
 
@@ -97,6 +98,7 @@ app.use("/api/admin", adminRoutes);
 // app.use("/api/chats", chatRoutes);
 // app.use("/api/communities", communityRoutes);
 app.use("/api/messages", chatRoutes);
+app.use("/api/connects", communityRoutes);
 
 // 404 handler
 app.use(notFound);
