@@ -165,11 +165,11 @@ const ChatWindow = ({ chatId }) => {
             </div>
           </div>
         ) : (
-          messages.map((message) => {
+          messages.map((message, idx) => {
             const isOwn = message.senderId === user?.id;
 
             return (
-              <div key={message.id} className="w-full">
+              <div key={`${message.id}-${idx}`} className="w-full">
                 {/* Own Messages - Right Side */}
                 {isOwn ? (
                   <div className="flex justify-end mb-4">

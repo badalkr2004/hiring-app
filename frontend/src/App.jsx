@@ -26,13 +26,13 @@ import AdminCompanyList from "./components/dashboards/superAdmin/CompanyList";
 import AdminCompanyView from "./components/dashboards/superAdmin/AdminCompanyProfile";
 import AdminCompanyEdit from "./components/dashboards/superAdmin/AdminCompanyEdit";
 
-import EmployerChat from "./features/components/job/EmployerChat";
-import Chat from "./features/pages/Chat";
-import { ChatProvider } from "./features/context/ChatContext";
 import CompaniesPage from "./pages/CompaniesPage";
 import CompanyDetailPage from "./pages/CompanyDetailPage";
-import ChatWindow from "./components/chat/chatWindow";
+
 import ChatApp from "./components/chat/chatLayout";
+import CommunityList from "./components/community/commnityList";
+import CreateCommunity from "./components/community/createCommunity";
+import CommunityDetail from "./components/community/commnunityDetail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -157,15 +157,14 @@ function App() {
                 }
               />
 
-              {/* <Route path="/messages" element={<Chat />} />
-                <Route
-                  path="/jobs/:jobId/chat/:employerId"
-                  element={<EmployerChat />}
-                /> */}
-              {/* 
-                <Route path="/companies" element={<CompaniesPage />} />
-                <Route path="/companies/:id" element={<CompanyDetailPage />} /> */}
+              <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/companies/:id" element={<CompanyDetailPage />} />
               <Route path="/message" element={<ChatApp />} />
+
+              <Route path="/communities" element={<CommunityList />} />
+              <Route path="/communities/create" element={<CreateCommunity />} />
+              <Route path="/communities/:id" element={<CommunityDetail />} />
+
               {/* Redirect unknown routes */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
