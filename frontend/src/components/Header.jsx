@@ -57,7 +57,7 @@ const Header = () => {
               <Briefcase className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              JobFlow
+              Al Made Canada
             </span>
           </Link>
 

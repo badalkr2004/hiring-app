@@ -79,18 +79,22 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Hero Section */}
       <div className="relative overflow-hidden">
+        <img
+          src="https://res.cloudinary.com/dlyfwiaon/image/upload/v1752122296/jobFlow/pexels-mart-production-7605814_tnlfzj.jpg"
+          alt="Office background"
+          className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Find Your{" "}
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 Dream Job
               </span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-white max-w-3xl mx-auto">
               Discover thousands of opportunities from top companies. Build your
               career with the perfect role that matches your skills and
               ambitions.
@@ -98,8 +102,6 @@ const HomePage = () => {
           </div>
 
           <SearchBar filters={filters} onFiltersChange={setFilters} />
-
-          {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-4">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
