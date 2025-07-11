@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "../../libs/apis";
+import { AlignVerticalSpaceAround, User } from "lucide-react";
 
 const ChatList = ({ selectedChatId, onChatSelect }) => {
   const [chats, setChats] = useState([]);
@@ -48,7 +49,7 @@ const ChatList = ({ selectedChatId, onChatSelect }) => {
   return (
     <div className="w-80 bg-white border-r border-purple-100 flex flex-col shadow-lg">
       {/* Header */}
-      <div className="p-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <div className="p-3.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <svg
@@ -146,16 +147,10 @@ const ChatList = ({ selectedChatId, onChatSelect }) => {
                   }`}
                 >
                   <div className="relative">
-                    <img
-                      src={participant.avatar || "/default-avatar.png"}
-                      alt={`${participant.firstName || "User"} ${
-                        participant.lastName || ""
-                      }`}
+                    {participant.avatar ? <img
+                      src={participant.avatar}
                       className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-200"
-                      onError={(e) => {
-                        e.target.src = "/default-avatar.png";
-                      }}
-                    />
+                    /> : <User className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-200"/>}
                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-gradient-to-r from-green-400 to-green-500 rounded-full border-2 border-white"></div>
                   </div>
 
