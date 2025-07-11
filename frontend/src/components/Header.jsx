@@ -221,7 +221,7 @@ const Header = () => {
                   <span>Settings</span>
                 </Link>
                 <Link
-                  to="/chat"
+                  to="/message"
                   className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
                   onClick={() => setShowMobileMenu(false)}
                 >

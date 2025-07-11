@@ -159,11 +159,10 @@ function App() {
 
               <Route path="/companies" element={<CompaniesPage />} />
               <Route path="/companies/:id" element={<CompanyDetailPage />} />
-              <Route path="/message" element={<ChatApp />} />
-
-              <Route path="/communities" element={<CommunityList />} />
-              <Route path="/communities/create" element={<CreateCommunity />} />
-              <Route path="/communities/:id" element={<CommunityDetail />} />
+              <Route path="/message" element={<ProtectedRoute allowedRoles={["COMPANY", "ADMIN", "USER"]}><ChatApp /></ProtectedRoute>} />
+              <Route path="/communities" element={<ProtectedRoute allowedRoles={["COMPANY", "ADMIN", "USER"]}><CommunityList /></ProtectedRoute>} />
+              <Route path="/communities/create" element={<ProtectedRoute allowedRoles={["COMPANY", "ADMIN" , "USER"]}><CreateCommunity /></ProtectedRoute>} />
+              <Route path="/communities/:id" element={<ProtectedRoute allowedRoles={["COMPANY", "ADMIN", "USER"]}><CommunityDetail /></ProtectedRoute>} />
 
               {/* Redirect unknown routes */}
               <Route path="*" element={<Navigate to="/" replace />} />

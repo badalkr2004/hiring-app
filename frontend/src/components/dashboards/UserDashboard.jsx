@@ -214,12 +214,9 @@ const UserDashboard = () => {
                           {application.status?.toLowerCase()}
                         </span>
                       </span>
-                      <button className="text-blue-600 hover:text-blue-700 font-medium">
-                        View Details
-                      </button>
                       <div className="text-blue-600 hover:text-blue-700 font-medium">
                         <ChatButton
-                          text={"Chat with Emloyer"}
+                          text={"Chat with Employer"}
                           applicationId={application.id}
                         />
                       </div>
