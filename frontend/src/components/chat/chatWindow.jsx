@@ -9,7 +9,7 @@ const ChatWindow = ({ chatId }) => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
-  const { user } = useAuth();
+  const { userData } = useAuth();
 
   useEffect(() => {
     if (chatId) {
@@ -166,7 +166,7 @@ const ChatWindow = ({ chatId }) => {
           </div>
         ) : (
           messages.map((message, idx) => {
-            const isOwn = message.senderId === user?.id;
+            const isOwn = message.senderId === userData?.id;
 
             return (
               <div key={`${message.id}-${idx}`} className="w-full">
