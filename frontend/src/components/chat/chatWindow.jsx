@@ -12,6 +12,9 @@ const ChatWindow = ({ chatId }) => {
   const messagesEndRef = useRef(null);
   const { userData } = useAuth();
 
+  // Track optimistic messages to prevent duplicates
+  const optimisticMessagesRef = useRef(new Set());
+
   useEffect(() => {
     if (chatId) {
       fetchMessages();
@@ -21,6 +24,8 @@ const ChatWindow = ({ chatId }) => {
     return () => {
       const pusher = getPusher();
       pusher.unsubscribe(`private-chat-${chatId}`);
+      // Clear optimistic messages when chat changes
+      optimisticMessagesRef.current.clear();
     };
   }, [chatId]);
 
@@ -32,9 +37,12 @@ const ChatWindow = ({ chatId }) => {
     try {
       setLoading(true);
       const response = await api.get(`/messages/chats/${chatId}/messages`);
-      setMessages(response.data.data);
+      setMessages(response.data.data || []);
+      // Clear optimistic messages when fetching fresh data
+      optimisticMessagesRef.current.clear();
     } catch (error) {
       console.error("Error fetching messages:", error);
+      setMessages([]);
     } finally {
       setLoading(false);
     }
@@ -45,7 +53,27 @@ const ChatWindow = ({ chatId }) => {
     const channel = pusher.subscribe(`private-chat-${chatId}`);
 
     channel.bind("message:new", (message) => {
-      setMessages((prev) => [...prev, message]);
+      // Check if this message was sent optimistically by current user
+      const tempId = `temp-${message.content}-${userData?.id}`;
+
+      if (optimisticMessagesRef.current.has(tempId)) {
+        // Replace optimistic message with real message
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === tempId ? { ...message, id: message.id } : msg
+          )
+        );
+        optimisticMessagesRef.current.delete(tempId);
+      } else {
+        // Add new message from other users
+        setMessages((prev) => {
+          // Prevent duplicate messages
+          const messageExists = prev.some((msg) => msg.id === message.id);
+          if (messageExists) return prev;
+
+          return [...prev, message];
+        });
+      }
     });
   };
 
@@ -57,14 +85,51 @@ const ChatWindow = ({ chatId }) => {
     e.preventDefault();
     if (!newMessage.trim() || sending) return;
 
+    const messageContent = newMessage.trim();
+    const tempId = `temp-${messageContent}-${userData?.id}`;
+
+    // Create optimistic message
+    const optimisticMessage = {
+      id: tempId,
+      content: messageContent,
+      senderId: userData?.id,
+      createdAt: new Date().toISOString(),
+      isOptimistic: true, // Flag to identify optimistic messages
+    };
+
+    // Add optimistic message immediately
+    setMessages((prev) => [...prev, optimisticMessage]);
+    optimisticMessagesRef.current.add(tempId);
+
+    // Clear input
+    setNewMessage("");
     setSending(true);
+
     try {
-      await api.post(`/messages/chats/${chatId}/messages`, {
-        content: newMessage.trim(),
+      const response = await api.post(`/messages/chats/${chatId}/messages`, {
+        content: messageContent,
       });
-      setNewMessage("");
+
+      // Replace optimistic message with real message
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === tempId ? { ...response.data, isOptimistic: false } : msg
+        )
+      );
+
+      optimisticMessagesRef.current.delete(tempId);
     } catch (error) {
       console.error("Error sending message:", error);
+
+      // Remove failed optimistic message
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
+      optimisticMessagesRef.current.delete(tempId);
+
+      // Restore message in input for retry
+      setNewMessage(messageContent);
+
+      // You could show an error toast here
+      alert("Failed to send message. Please try again.");
     } finally {
       setSending(false);
     }
@@ -155,6 +220,7 @@ const ChatWindow = ({ chatId }) => {
           <div className="space-y-4">
             {messages.map((message, idx) => {
               const isOwn = message.senderId === userData?.id;
+              const isOptimistic = message.isOptimistic;
 
               return (
                 <div
@@ -162,20 +228,43 @@ const ChatWindow = ({ chatId }) => {
                   className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg relative ${
                       isOwn
-                        ? "bg-blue-500 text-white"
+                        ? `${
+                            isOptimistic
+                              ? "bg-blue-400 text-white opacity-70"
+                              : "bg-blue-500 text-white"
+                          }`
                         : "bg-white text-gray-900 border border-gray-200"
                     }`}
                   >
                     <p className="text-sm">{message.content}</p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        isOwn ? "text-blue-100" : "text-gray-500"
-                      }`}
-                    >
-                      {formatTime(message.createdAt)}
-                    </p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p
+                        className={`text-xs ${
+                          isOwn ? "text-blue-100" : "text-gray-500"
+                        }`}
+                      >
+                        {formatTime(message.createdAt)}
+                      </p>
+                      {isOptimistic && (
+                        <div className="ml-2">
+                          <svg
+                            className="w-3 h-3 text-blue-200 animate-pulse"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
