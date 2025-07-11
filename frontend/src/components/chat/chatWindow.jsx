@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import api from "./api";
 import { useAuth } from "../../contexts/AuthContext";
 import { getPusher } from "../../libs/pusher";
+import { Send } from "lucide-react";
 
 const ChatWindow = ({ chatId }) => {
   const [messages, setMessages] = useState([]);
@@ -225,7 +226,7 @@ const ChatWindow = ({ chatId }) => {
                 ></path>
               </svg>
             ) : (
-              "Send"
+              <Send className="h-4 w-4" />
             )}
           </button>
         </form>

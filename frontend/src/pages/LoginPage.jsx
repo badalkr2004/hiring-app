@@ -57,7 +57,7 @@ const LoginPage = () => {
                 <Briefcase className="h-10 w-10 text-white" />
               </div>
               <span className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                JobFlow
+                AI Made Canada
               </span>
             </Link>
 

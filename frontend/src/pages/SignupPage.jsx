@@ -130,15 +130,15 @@ const SignupPage = () => {
           <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center shadow-md mr-4">
             <Briefcase className="h-8 w-8 text-white" />
           </div>
-          <span className="text-3xl font-bold text-gray-900">JobFlow</span>
+          <span className="text-3xl font-bold text-gray-900">Al Made Canada</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
           Hire Top Talent <br /> with{" "}
-          <span className="text-blue-600">JobFlow</span>
+          <span className="text-blue-600">AI Made Canada</span>
         </h1>
         <p className="text-lg text-gray-600 mb-8 max-w-xl">
           Post jobs, manage applicants, and grow your team with ease. Connect
-          with thousands of candidates and top companies on JobFlow.
+          with thousands of candidates and top companies on AI Made Canada.
         </p>
         <div className="flex flex-col sm:flex-row gap-6 w-full max-w-xl">
           <div className="flex-1 bg-white rounded-2xl shadow p-6 flex items-center space-x-4">
