@@ -4,6 +4,7 @@ import { api } from "../../libs/apis";
 import { useAuth } from "../../contexts/AuthContext";
 import ChatWindow from "../chat/chatWindow";
 import { getPusher } from "../../libs/pusher";
+import { User } from "lucide-react";
 
 const CommunityDetail = () => {
   const { id } = useParams();
@@ -106,11 +107,11 @@ const CommunityDetail = () => {
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <img
-                src={community.avatar || "/default-community.png"}
+              {community.avatar ?<img
+                src={community.avatar}
                 alt={community.name}
                 className="w-16 h-16 rounded-full border-4 border-purple-200"
-              />
+              /> : <User className="w-16 h-16 rounded-full border-4 border-purple-200"/>}
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
                   {community.name}

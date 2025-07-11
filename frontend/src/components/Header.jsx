@@ -12,6 +12,7 @@ import {
   X,
   Loader2,
   MessageSquare,
+  CommandIcon,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -38,6 +39,7 @@ const Header = () => {
       requiresRole: "COMPANY",
     },
     { path: "/companies", label: "Companies", icon: Users },
+    { path: "/communities", label: "Community", icon: Users, requiresAuth: true, requiresRole: "ALL" },
   ];
 
   const filteredNavItems = navItems.filter(
@@ -45,7 +47,7 @@ const Header = () => {
       !item.requiresAuth ||
       (item.requiresAuth &&
         userData &&
-        (userData?.role === item.requiresRole || userData?.role === "ADMIN"))
+        (userData?.role === item.requiresRole || item.requiresRole === "ALL"))
   );
 
   return (

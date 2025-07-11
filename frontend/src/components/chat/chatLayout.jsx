@@ -3,13 +3,13 @@ import ChatList from "./ChatList";
 import ChatWindow from "./chatWindow";
 import { useAuth } from "../../contexts/AuthContext";
 import { initializePusher } from "../../libs/pusher";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ChatApp = () => {
   const [selectedChatId, setSelectedChatId] = useState();
   const { chatId } = useParams();
   const { userData, loading } = useAuth();
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (userData) {
       initializePusher();
@@ -53,7 +53,9 @@ const ChatApp = () => {
           <p className="text-gray-600 mb-6">
             You need to be logged in to access the chat feature.
           </p>
-          <button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105">
+          <button 
+          onClick={() => navigate("/login")}
+          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105">
             Login Now
           </button>
         </div>

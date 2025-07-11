@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../libs/apis";
 import { useAuth } from "../../contexts/AuthContext";
+import { User } from "lucide-react";
 
 const CommunityList = () => {
   const [communities, setCommunities] = useState([]);
@@ -171,12 +172,12 @@ const CommunityList = () => {
 
                 <div className="p-6">
                   <div className="flex items-center mb-4">
-                    <img
-                      src={community.avatar || "/default-community.png"}
+                    {community.avatar ?<img
+                      src={community.avatar}
                       alt={community.name}
                       className="w-12 h-12 rounded-full mr-3"
-                    />
-                    <div>
+                    /> : <User className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-200"/>}
+                    <div className="ml-3">
                       <h3 className="font-semibold text-gray-900">
                         {community.name}
                       </h3>
