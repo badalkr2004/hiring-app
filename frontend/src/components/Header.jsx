@@ -119,14 +119,7 @@ const Header = () => {
                       <Settings className="h-4 w-4" />
                       <span>Settings</span>
                     </Link>
-                    <Link
-                      to="/messages"
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-gray-50"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      <span>Messages</span>
-                    </Link>
+
                     <hr className="my-2" />
                     <button
                       onClick={handleLogout}
