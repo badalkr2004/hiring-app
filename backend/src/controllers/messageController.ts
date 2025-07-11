@@ -10,6 +10,14 @@ export const getMessages = async (req: Request, res: Response) => {
 
   const messages = await prisma.message.findMany({
     where: { chatId },
+    include: {
+      sender: {
+        select: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
     orderBy: { createdAt: "asc" },
   });
 
@@ -33,5 +41,5 @@ export const sendMessage = async (req: Request, res: Response) => {
 
   await pusher.trigger(`private-chat-${chatId}`, "message:new", message);
 
-  res.json({ success: true, data: message });
+  res.json({ success: true, data: { ...message } });
 };
