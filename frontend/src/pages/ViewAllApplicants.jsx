@@ -232,7 +232,6 @@ const ViewAllApplicants = ({ jobId }) => {
         {/* Left: Applicants List */}
         <div className="w-[340px] bg-gradient-to-b from-blue-50 to-indigo-50 border-r border-gray-200 flex flex-col hidden md:flex">
           <div className="p-4 border-b border-gray-200">
-            z
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
