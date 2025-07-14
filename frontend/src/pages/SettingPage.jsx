@@ -1,8 +1,8 @@
-import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import UserSettings from '../components/settings/userSetting';
-import CompanySettings from '../components/settings/companySettings';
-import AdminSettings from '../components/settings/adminSetting';
+import React from "react";
+import { useAuth } from "../contexts/AuthContext";
+import UserSettings from "../components/settings/UserSetting";
+import CompanySettings from "../components/settings/companySettings";
+import AdminSettings from "../components/settings/adminSetting";
 
 const SettingsPage = () => {
   const { userData } = useAuth();
@@ -10,11 +10,11 @@ const SettingsPage = () => {
   if (!userData) return null;
 
   switch (userData.role) {
-    case 'USER':
+    case "USER":
       return <UserSettings />;
-    case 'COMPANY':
+    case "COMPANY":
       return <CompanySettings />;
-    case 'ADMIN':
+    case "ADMIN":
       return <AdminSettings />;
     default:
       return <div>Invalid user role</div>;
