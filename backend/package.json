@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon --watch src -r tsconfig-paths/register src/server.ts",
-    "build": "npx tsup",
+    "build": "tsup",
     "start": "node ./dist/server.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
