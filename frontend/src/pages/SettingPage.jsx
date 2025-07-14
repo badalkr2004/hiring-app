@@ -1,8 +1,8 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import UserSettings from "../components/settings/UserSetting";
-import CompanySettings from "../components/settings/companySettings";
-import AdminSettings from "../components/settings/adminSetting";
+import CompanySettings from "../components/settings/CompanySettings";
+import AdminSettings from "../components/settings/AdminSetting";
 
 const SettingsPage = () => {
   const { userData } = useAuth();
